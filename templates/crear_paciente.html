@@ -1,0 +1,732 @@
+{% extends "base.html" %}
+
+{% block title %}
+Crear paciente | Smile Cloud
+{% endblock %}
+
+{% block content %}
+
+<main class="pagina-formulario-paciente">
+
+    <section class="encabezado-pagina-formulario">
+
+        <div>
+            <span class="titulo-pequeno">
+                Gestión clínica
+            </span>
+
+            <h1>
+                Registro de Nuevo Paciente
+            </h1>
+
+            <p>
+                Complete la información necesaria para registrar un nuevo paciente.
+            </p>
+        </div>
+
+        <a href="/pacientes" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+            Volver a pacientes
+        </a>
+
+    </section>
+
+
+    <form action="/crear_paciente" method="POST" class="formulario-paciente-pagina">
+
+
+        <!-- ================= INFORMACIÓN DEL PACIENTE ================= -->
+
+        <section class="seccion-formulario">
+
+            <div class="titulo-seccion">
+
+                <i class="bi bi-person"></i>
+
+                Información del paciente
+
+            </div>
+
+
+            <div class="row g-3">
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Primer nombre *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nombre"
+                        class="form-control"
+                        placeholder="Ingrese el nombre"
+                        required>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Segundo nombre
+                    </label>
+
+                    <input
+                        type="text"
+                        name="segundo_nombre"
+                        class="form-control"
+                        placeholder="Segundo nombre">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Primer apellido *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="apellido"
+                        class="form-control"
+                        placeholder="Ingrese el apellido"
+                        required>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Segundo apellido
+                    </label>
+
+                    <input
+                        type="text"
+                        name="segundo_apellido"
+                        class="form-control"
+                        placeholder="Segundo apellido">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Documento de identidad *
+                    </label>
+
+                    <input
+                        type="text"
+                        name="numero_documento"
+                        class="form-control"
+                        placeholder="Número de documento"
+                        required>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Tipo de documento
+                    </label>
+
+                    <select
+                        name="tipo_documento"
+                        class="form-select"
+                        required>
+
+                        <option value="">
+                            Seleccione
+                        </option>
+
+                        <option value="CC">
+                            Cédula de ciudadanía
+                        </option>
+
+                        <option value="TI">
+                            Tarjeta de identidad
+                        </option>
+
+                        <option value="CE">
+                            Cédula de extranjería
+                        </option>
+
+                        <option value="PAS">
+                            Pasaporte
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Fecha de nacimiento
+                    </label>
+
+                    <input
+                        type="date"
+                        name="fecha_nacimiento"
+                        class="form-control">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Género
+                    </label>
+
+                    <select
+                        name="sexo"
+                        class="form-select">
+
+                        <option value="">
+                            Seleccione
+                        </option>
+
+                        <option value="Femenino">
+                            Femenino
+                        </option>
+
+                        <option value="Masculino">
+                            Masculino
+                        </option>
+
+                        <option value="Otro">
+                            Otro
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Dirección
+                    </label>
+
+                    <input
+                        type="text"
+                        name="direccion"
+                        class="form-control"
+                        placeholder="Dirección de residencia">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Ciudad
+                    </label>
+
+                    <input
+                        type="text"
+                        name="ciudad"
+                        class="form-control"
+                        placeholder="Ciudad">
+
+                </div>
+
+
+                <div class="col-md-2">
+
+                    <label>
+                        Estado
+                    </label>
+
+                    <input
+                        type="text"
+                        name="estado"
+                        class="form-control"
+                        placeholder="Estado">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Código postal
+                    </label>
+
+                    <input
+                        type="text"
+                        name="codigo_postal"
+                        class="form-control"
+                        placeholder="Código postal">
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label>
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        class="form-control"
+                        placeholder="ejemplo@correo.com">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        class="form-control"
+                        placeholder="Número de teléfono">
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>
+                        Teléfono alternativo
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono_alternativo"
+                        class="form-control"
+                        placeholder="Número alternativo">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= CONTACTO DE EMERGENCIA ================= -->
+
+        <section class="seccion-formulario">
+
+            <div class="titulo-seccion">
+
+                <i class="bi bi-telephone"></i>
+
+                Contacto de emergencia
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label>
+                        Nombre completo
+                    </label>
+
+                    <input
+                        type="text"
+                        name="contacto_emergencia"
+                        class="form-control"
+                        placeholder="Nombre del contacto">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Parentesco
+                    </label>
+
+                    <input
+                        type="text"
+                        name="parentesco"
+                        class="form-control"
+                        placeholder="Ej. Madre, padre, hermano">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Número de contacto
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono_emergencia"
+                        class="form-control"
+                        placeholder="Teléfono">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= INFORMACIÓN MÉDICA ================= -->
+
+        <section class="seccion-formulario">
+
+            <div class="titulo-seccion">
+
+                <i class="bi bi-heart-pulse"></i>
+
+                Información médica
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label>
+                        Médico de cabecera
+                    </label>
+
+                    <input
+                        type="text"
+                        name="medico_cabecera"
+                        class="form-control"
+                        placeholder="Nombre del médico">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Teléfono médico
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono_medico"
+                        class="form-control"
+                        placeholder="Teléfono">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Dirección médica
+                    </label>
+
+                    <input
+                        type="text"
+                        name="direccion_medica"
+                        class="form-control"
+                        placeholder="Dirección">
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label>
+                        Condiciones médicas
+                    </label>
+
+                    <textarea
+                        name="condiciones_medicas"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Describa las condiciones médicas relevantes"></textarea>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label>
+                        Medicamentos actuales
+                    </label>
+
+                    <textarea
+                        name="medicamentos"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Indique los medicamentos que utiliza actualmente"></textarea>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label>
+                        Alergias
+                    </label>
+
+                    <textarea
+                        name="alergias"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Indique alergias conocidas"></textarea>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label>
+                        Observaciones médicas
+                    </label>
+
+                    <textarea
+                        name="observaciones_medicas"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Información adicional"></textarea>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= INFORMACIÓN DEL SEGURO ================= -->
+
+        <section class="seccion-formulario">
+
+            <div class="titulo-seccion">
+
+                <i class="bi bi-shield-check"></i>
+
+                Información del seguro
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label>
+                        Entidad / EPS
+                    </label>
+
+                    <input
+                        type="text"
+                        name="eps"
+                        class="form-control"
+                        placeholder="Nombre de la EPS">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Plan
+                    </label>
+
+                    <input
+                        type="text"
+                        name="plan"
+                        class="form-control"
+                        placeholder="Tipo de plan">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono_eps"
+                        class="form-control"
+                        placeholder="Teléfono de la entidad">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Número de póliza
+                    </label>
+
+                    <input
+                        type="text"
+                        name="numero_poliza"
+                        class="form-control">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Número de grupo
+                    </label>
+
+                    <input
+                        type="text"
+                        name="numero_grupo"
+                        class="form-control">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label>
+                        Número de seguridad social
+                    </label>
+
+                    <input
+                        type="text"
+                        name="seguridad_social"
+                        class="form-control">
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= INFORMACIÓN ADICIONAL ================= -->
+
+        <section class="seccion-formulario">
+
+            <div class="titulo-seccion">
+
+                <i class="bi bi-file-text"></i>
+
+                Información adicional
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label>
+                        Nombre del padre o acudiente
+                    </label>
+
+                    <input
+                        type="text"
+                        name="acudiente"
+                        class="form-control"
+                        placeholder="Si aplica">
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label>
+                        Relación con el paciente
+                    </label>
+
+                    <input
+                        type="text"
+                        name="relacion_acudiente"
+                        class="form-control"
+                        placeholder="Ej. Madre, padre, tutor">
+
+                </div>
+
+
+                <div class="col-md-12">
+
+                    <label>
+                        Observaciones
+                    </label>
+
+                    <textarea
+                        name="observaciones"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Escriba cualquier información adicional"></textarea>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= AVISO ================= -->
+
+        <div class="alerta-formulario">
+
+            <i class="bi bi-info-circle"></i>
+
+            <span>
+                La información registrada debe ser verídica y será utilizada
+                exclusivamente para la gestión del paciente dentro de Smile Cloud.
+            </span>
+
+        </div>
+
+
+        <!-- ================= BOTONES ================= -->
+
+        <div class="acciones-formulario">
+
+            <a
+                href="/pacientes"
+                class="btn btn-secondary">
+
+                Cancelar
+
+            </a>
+
+
+            <button
+                type="reset"
+                class="btn btn-outline-secondary">
+
+                Limpiar
+
+            </button>
+
+
+            <button
+                type="submit"
+                class="btn btn-success">
+
+                <i class="bi bi-person-plus"></i>
+
+                Guardar paciente
+
+            </button>
+
+        </div>
+
+    </form>
+
+</main>
+
+{% endblock %}

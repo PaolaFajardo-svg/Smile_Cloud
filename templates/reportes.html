@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes | Smile Cloud{% endblock %}
+
+{% block content %}
+<div class="reportes-container">
+
+    <div class="encabezado-reportes">
+        <div>
+            <span class="etiqueta-reportes">
+                <i class="bi bi-bar-chart-line"></i>
+                Información del sistema
+            </span>
+            <h1>Reportes</h1>
+            <p>Consulta y exporta información real registrada en Smile Cloud.</p>
+        </div>
+        <div class="icono-reportes">
+            <i class="bi bi-file-earmark-bar-graph"></i>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alerta-reporte" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <section class="seccion-reportes">
+        <div class="titulo-seccion-reportes">
+            <div class="icono-seccion-reportes">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <div>
+                <h2>Resumen general</h2>
+                <p>Los valores se consultan directamente de la base de datos.</p>
+            </div>
+        </div>
+
+        <div class="tarjetas-reportes">
+            <div class="tarjeta-reporte">
+                <div class="icono-tarjeta-reporte"><i class="bi bi-people"></i></div>
+                <div>
+                    <span class="numero-reporte">{{ total_pacientes }}</span>
+                    <span class="nombre-reporte">Pacientes</span>
+                    <p>Pacientes activos</p>
+                </div>
+            </div>
+
+            <div class="tarjeta-reporte">
+                <div class="icono-tarjeta-reporte"><i class="bi bi-file-medical"></i></div>
+                <div>
+                    <span class="numero-reporte">{{ total_historias }}</span>
+                    <span class="nombre-reporte">Historias</span>
+                    <p>Consultas clínicas registradas</p>
+                </div>
+            </div>
+
+            <div class="tarjeta-reporte">
+                <div class="icono-tarjeta-reporte"><i class="bi bi-person-badge"></i></div>
+                <div>
+                    <span class="numero-reporte">{{ total_odontologos }}</span>
+                    <span class="nombre-reporte">Odontólogos</span>
+                    <p>Profesionales registrados</p>
+                </div>
+            </div>
+
+            <div class="tarjeta-reporte">
+                <div class="icono-tarjeta-reporte"><i class="bi bi-person-check"></i></div>
+                <div>
+                    <span class="numero-reporte">{{ total_usuarios }}</span>
+                    <span class="nombre-reporte">Usuarios</span>
+                    <p>Usuarios activos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="seccion-reportes">
+        <div class="titulo-seccion-reportes">
+            <div class="icono-seccion-reportes"><i class="bi bi-funnel"></i></div>
+            <div>
+                <h2>Generar reporte</h2>
+                <p>Seleccione el tipo de información y los filtros que necesita.</p>
+            </div>
+        </div>
+
+        <form class="formulario-reportes" method="GET" action="{{ url_for('report') }}">
+            <div class="campo-reporte">
+                <label for="tipoReporte">Tipo de reporte</label>
+                <select id="tipoReporte" name="tipo" onchange="this.form.submit()">
+                    <option value="pacientes" {% if tipo == 'pacientes' %}selected{% endif %}>Pacientes registrados</option>
+                    <option value="historias" {% if tipo == 'historias' %}selected{% endif %}>Historias clínicas</option>
+                    <option value="usuarios" {% if tipo == 'usuarios' %}selected{% endif %}>Usuarios del sistema</option>
+                    <option value="odontologo" {% if tipo == 'odontologo' %}selected{% endif %}>Pacientes por odontólogo</option>
+                </select>
+            </div>
+
+            <div class="campo-reporte">
+                <label for="fechaInicial">Fecha inicial</label>
+                <input type="date" id="fechaInicial" name="fecha_inicial" value="{{ fecha_inicial }}">
+            </div>
+
+            <div class="campo-reporte">
+                <label for="fechaFinal">Fecha final</label>
+                <input type="date" id="fechaFinal" name="fecha_final" value="{{ fecha_final }}">
+            </div>
+
+            <div class="campo-reporte">
+                <label for="odontologoReporte">Odontólogo</label>
+                <select id="odontologoReporte" name="odontologo">
+                    <option value="todos" {% if odontologo_seleccionado == 'todos' %}selected{% endif %}>Todos</option>
+                    {% for odontologo in odontologos %}
+                    <option value="{{ odontologo.id_funcionario }}" {% if odontologo_seleccionado|string == odontologo.id_funcionario|string %}selected{% endif %}>
+                        {{ odontologo.nombre_completo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="boton-generar-reporte">
+                <button type="submit">
+                    <i class="bi bi-search"></i>
+                    Generar reporte
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="seccion-reportes">
+        <div class="titulo-seccion-reportes">
+            <div class="icono-seccion-reportes"><i class="bi bi-table"></i></div>
+            <div>
+                <h2>Resultado: {{ nombre_reporte }}</h2>
+                <p>{{ total_resultados }} registro(s) encontrado(s) con los filtros seleccionados.</p>
+            </div>
+        </div>
+
+        <div class="tabla-responsive-reportes">
+            <table class="tabla-reportes">
+                <thead>
+                    <tr>
+                        {% for nombre, clave in columnas %}
+                        <th>{{ nombre }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if filas %}
+                        {% for fila in filas %}
+                        <tr>
+                            {% for nombre, clave in columnas %}
+                            <td>{{ fila[clave] if fila[clave] is not none else '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="{{ columnas|length }}" class="sin-resultados-reporte">
+                                <i class="bi bi-inbox"></i>
+                                No hay registros para mostrar con los filtros seleccionados.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="seccion-reportes">
+        <div class="titulo-seccion-reportes">
+            <div class="icono-seccion-reportes"><i class="bi bi-download"></i></div>
+            <div>
+                <h2>Exportar reporte</h2>
+                <p>Los archivos contienen exactamente el reporte generado y sus filtros actuales.</p>
+            </div>
+        </div>
+
+        <div class="botones-reportes">
+            <a href="{{ url_for('exportar_pdf', tipo=tipo, fecha_inicial=fecha_inicial, fecha_final=fecha_final, odontologo=odontologo_seleccionado) }}" class="btn-exportar btn-pdf">
+                <i class="bi bi-file-earmark-pdf"></i>
+                Exportar PDF
+            </a>
+
+            <a href="{{ url_for('exportar_excel', tipo=tipo, fecha_inicial=fecha_inicial, fecha_final=fecha_final, odontologo=odontologo_seleccionado) }}" class="btn-exportar btn-excel">
+                <i class="bi bi-file-earmark-excel"></i>
+                Exportar Excel
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,540 @@
+{% extends "base.html" %}
+
+{% block title %}Ficha | Smile Cloud{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia Clínica - Smile Cloud</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+</head>
+<body>
+
+<main class="hc-page">
+    <div class="hc-card">
+        <div class="hc-top">
+            <div>
+                <h1>Historia Clínica</h1>
+                <p>Gestión clínica y odontológica del paciente</p>
+            </div>
+            <button class="hc-print" type="button" id="btn-imprimir-historial">🖨 Imprimir historia clínica</button>
+        </div>
+
+        <div class="hc-tabs" role="tablist">
+            <button class="hc-tab active" data-tab="historial">Historial</button>
+            <button class="hc-tab" data-tab="evoluciones">Evoluciones</button>
+            <button class="hc-tab" data-tab="anamnesis">Ficha Anamnesis</button>
+            <button class="hc-tab" data-tab="rx">Rx y Documentos</button>
+            <button class="hc-tab" data-tab="documentos">Consentimientos</button>
+        </div>
+
+        <!-- HISTORIAL -->
+        <section class="hc-panel active" id="tab-historial">
+            <div class="hc-search-row">
+                <div class="hc-search-box">
+                    <label for="buscar-documento">Buscar paciente por documento</label>
+                    <div class="hc-search-input">
+                        <input id="buscar-documento" type="text" placeholder="Ingrese el número de documento">
+                        <button type="button" id="btn-buscar-paciente">Buscar</button>
+                    </div>
+                    <small id="mensaje-busqueda"></small>
+                </div>
+            </div>
+
+            <section class="hc-section">
+                <h2>Información del paciente</h2>
+                <div class="hc-grid hc-grid-3">
+                    <div><label>Nombre completo</label><input id="paciente-nombre" type="text" readonly></div>
+                    <div><label>Documento</label><input id="paciente-documento" type="text" readonly></div>
+                    <div><label>Teléfono</label><input id="paciente-telefono" type="text" readonly></div>
+                    <div><label>Correo electrónico</label><input id="paciente-correo" type="email" readonly></div>
+                    <div><label>Tratamiento</label><input id="paciente-tratamiento" type="text" readonly></div>
+                    <div><label>Especialista</label><input id="paciente-especialista" type="text" readonly></div>
+                </div>
+            </section>
+
+            <section class="hc-section">
+    <div class="hc-section-head">
+        <div>
+            <h2>Consulta odontológica</h2>
+            <p class="hc-muted">
+                Registre la información mediante opciones rápidas o utilizando el registro por voz.
+            </p>
+        </div>
+
+        <button class="hc-btn primary" type="button" id="btn-voz">
+            🎙️ Registrar por voz
+        </button>
+    </div>
+
+    <div id="estado-voz" class="hc-muted" style="margin-bottom: 15px;"></div>
+
+    <div class="hc-grid hc-grid-2">
+
+        <!-- MOTIVO -->
+        <div class="hc-full">
+            <label>Motivo de la consulta</label>
+
+            <div class="hc-options">
+                <label>
+                    <input type="checkbox" name="motivo" value="Dolor dental">
+                    Dolor dental
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Revisión general">
+                    Revisión general
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Limpieza">
+                    Limpieza
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Caries">
+                    Caries
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Sensibilidad dental">
+                    Sensibilidad dental
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Fractura dental">
+                    Fractura dental
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Inflamación">
+                    Inflamación
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Control">
+                    Control
+                </label>
+
+                <label>
+                    <input type="checkbox" name="motivo" value="Otro">
+                    Otro
+                </label>
+            </div>
+        </div>
+
+
+        <!-- ENFERMEDAD ACTUAL -->
+        <div>
+            <label>Síntomas actuales</label>
+
+            <div class="hc-options vertical">
+                <label>
+                    <input type="checkbox" name="sintoma" value="Dolor">
+                    Dolor
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Inflamación">
+                    Inflamación
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Sangrado">
+                    Sangrado
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Sensibilidad al frío">
+                    Sensibilidad al frío
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Sensibilidad al calor">
+                    Sensibilidad al calor
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Dificultad para masticar">
+                    Dificultad para masticar
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Mal aliento">
+                    Mal aliento
+                </label>
+
+                <label>
+                    <input type="checkbox" name="sintoma" value="Ninguno">
+                    Ninguno
+                </label>
+            </div>
+
+            <div id="intensidad-dolor" style="display:none; margin-top:15px;">
+                <label>Intensidad del dolor</label>
+
+                <div class="hc-options">
+                    <label>
+                        <input type="radio" name="intensidad-dolor" value="Leve">
+                        Leve
+                    </label>
+
+                    <label>
+                        <input type="radio" name="intensidad-dolor" value="Moderado">
+                        Moderado
+                    </label>
+
+                    <label>
+                        <input type="radio" name="intensidad-dolor" value="Severo">
+                        Severo
+                    </label>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ANTECEDENTES -->
+        <div>
+            <label>Antecedentes médicos</label>
+
+            <div class="hc-options vertical">
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Diabetes">
+                    Diabetes
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Hipertensión">
+                    Hipertensión
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Asma">
+                    Asma
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Enfermedad cardíaca">
+                    Enfermedad cardíaca
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Epilepsia">
+                    Epilepsia
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Problemas de coagulación">
+                    Problemas de coagulación
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Ninguno">
+                    Ninguno
+                </label>
+
+                <label>
+                    <input type="checkbox" name="antecedente" value="Otro">
+                    Otro
+                </label>
+
+            </div>
+        </div>
+
+
+        <!-- ALERGIAS -->
+        <div>
+            <label>Alergias</label>
+
+            <div class="hc-options">
+                <label>
+                    <input type="radio" name="alergias" value="No">
+                    No
+                </label>
+
+                <label>
+                    <input type="radio" name="alergias" value="Sí">
+                    Sí
+                </label>
+            </div>
+
+            <div id="lista-alergias" style="display:none; margin-top:15px;">
+
+                <label>Seleccione las alergias</label>
+
+                <div class="hc-options vertical">
+
+                    <label>
+                        <input type="checkbox" name="tipo-alergia" value="Medicamentos">
+                        Medicamentos
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo-alergia" value="Penicilina">
+                        Penicilina
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo-alergia" value="Anestésicos">
+                        Anestésicos
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo-alergia" value="Látex">
+                        Látex
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="tipo-alergia" value="Alimentos">
+                        Alimentos
+                    </label>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- DIAGNÓSTICO -->
+        <div>
+            <label for="diagnostico">Diagnóstico</label>
+
+            <select id="diagnostico" multiple>
+                <option value="Caries dental">Caries dental</option>
+                <option value="Gingivitis">Gingivitis</option>
+                <option value="Periodontitis">Periodontitis</option>
+                <option value="Pulpitis">Pulpitis</option>
+                <option value="Fractura dental">Fractura dental</option>
+                <option value="Sensibilidad dental">Sensibilidad dental</option>
+                <option value="Ausencia dental">Ausencia dental</option>
+                <option value="Maloclusión">Maloclusión</option>
+                <option value="Otro">Otro</option>
+            </select>
+
+            <small class="hc-muted">
+                Puedes seleccionar uno o varios diagnósticos.
+            </small>
+        </div>
+
+
+        <!-- TRATAMIENTO -->
+        <div>
+            <label for="tratamiento">Procedimiento realizado</label>
+
+            <select id="tratamiento" multiple>
+                <option value="Limpieza dental">Limpieza dental</option>
+                <option value="Restauración">Restauración</option>
+                <option value="Extracción">Extracción</option>
+                <option value="Endodoncia">Endodoncia</option>
+                <option value="Aplicación de flúor">Aplicación de flúor</option>
+                <option value="Sellantes">Sellantes</option>
+                <option value="Blanqueamiento">Blanqueamiento</option>
+                <option value="Control">Control</option>
+                <option value="Otro">Otro</option>
+            </select>
+
+            <small class="hc-muted">
+                Puedes seleccionar uno o varios procedimientos.
+            </small>
+        </div>
+
+
+        <!-- OBSERVACIONES -->
+        <div class="hc-full">
+            <label for="observaciones-clinicas">
+                Observaciones adicionales
+            </label>
+
+            <textarea
+                id="observaciones-clinicas"
+                rows="3"
+                placeholder="Escriba únicamente información adicional que no esté contemplada en las opciones..."
+            ></textarea>
+        </div>
+
+
+        <!-- FECHAS -->
+        <div>
+            <label for="fecha-consulta">Fecha de la consulta</label>
+            <input id="fecha-consulta" type="date">
+        </div>
+
+        <div>
+            <label for="proximo-control">Próximo control</label>
+            <input id="proximo-control" type="date">
+        </div>
+
+    </div>
+</section>
+
+            <div class="hc-actions">
+                <button class="hc-btn secondary" type="button" id="btn-limpiar">Limpiar</button>
+                <button class="hc-btn primary" type="button" id="btn-guardar">Guardar historia clínica</button>
+                <a class="hc-btn outline" href="/pacientes">Volver</a>
+            </div>
+        </section>
+
+        <!-- EVOLUCIONES -->
+        <section class="hc-panel" id="tab-evoluciones">
+            <div class="hc-section">
+                <div class="hc-section-head">
+                    <h2>Evoluciones clínicas</h2>
+                    <button class="hc-btn primary small" type="button" id="btn-agregar-evolucion">+ Agregar evolución</button>
+                </div>
+                <div id="lista-evoluciones" class="hc-timeline">
+                    <p class="hc-empty">Aún no hay evoluciones registradas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANAMNESIS -->
+        <section class="hc-panel" id="tab-anamnesis">
+            <section class="hc-section">
+                <h2>Ficha de anamnesis</h2>
+                <div class="hc-grid hc-grid-2">
+                    <div><label>Alergias</label><textarea id="anamnesis-alergias" rows="4"></textarea></div>
+                    <div><label>Enfermedades</label><textarea id="anamnesis-enfermedades" rows="4"></textarea></div>
+                    <div><label>Medicamentos</label><textarea id="anamnesis-medicamentos" rows="4"></textarea></div>
+                    <div><label>Cirugías / antecedentes importantes</label><textarea id="anamnesis-cirugias" rows="4"></textarea></div>
+                </div>
+            </section>
+        </section>
+
+        <!-- RX -->
+        <section class="hc-panel" id="tab-rx">
+            <section class="hc-section">
+                <h2>Rx y documentos clínicos</h2>
+                <p class="hc-muted">Esta sección permite organizar radiografías y otros documentos asociados a la historia clínica.</p>
+                <input type="file" id="archivo-rx" multiple>
+                <div id="lista-archivos" class="hc-file-list"></div>
+            </section>
+        </section>
+
+        <!-- CONSENTIMIENTOS INFORMADOS -->
+        <section class="hc-panel" id="tab-documentos">
+            <section class="hc-section">
+                <h2>Consentimientos informados</h2>
+                <p class="hc-muted">Seleccione un consentimiento de la lista. Al elegirlo, el formato se abrirá inmediatamente para diligenciarlo en línea, firmarlo digitalmente o imprimirlo.</p>
+                <p id="cs-aviso" class="hc-error">Primero busque un paciente en la pestaña Historial.</p>
+                <div class="cs-selector-wrap">
+                    <label for="cs-selector">Tipo de consentimiento</label>
+                    <select id="cs-selector" class="cs-selector">
+                        <option value="">Seleccione un consentimiento...</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="hc-section" id="cs-formulario" hidden>
+                <div class="hc-section-head">
+                    <h2 id="cs-titulo"></h2>
+                </div>
+
+                <div class="hc-grid hc-grid-3">
+                    <div><label for="cs-paciente-nombre">Paciente</label><input id="cs-paciente-nombre" type="text" readonly></div>
+                    <div><label for="cs-paciente-documento">Documento</label><input id="cs-paciente-documento" type="text" readonly></div>
+                    <div><label for="cs-fecha">Fecha</label><input id="cs-fecha" type="date"></div>
+                    <div><label for="cs-profesional">Profesional que informa</label><input id="cs-profesional" type="text"></div>
+                </div>
+
+                <div id="cs-extras" class="hc-grid hc-grid-2 cs-bloque"></div>
+
+                <div class="cs-bloque">
+                    <label class="cs-check cs-check-linea">
+                        <input type="checkbox" id="cs-otro-firmante">
+                        <span>Firma un representante legal (paciente menor de edad o que no puede decidir por sí mismo)</span>
+                    </label>
+                    <div id="cs-firmante-datos" class="hc-grid hc-grid-3" hidden>
+                        <div><label for="cs-firmante-nombre">Nombre del representante</label><input id="cs-firmante-nombre" type="text"></div>
+                        <div><label for="cs-firmante-doc">Documento</label><input id="cs-firmante-doc" type="text"></div>
+                        <div><label for="cs-firmante-parentesco">Parentesco</label><input id="cs-firmante-parentesco" type="text" placeholder="Madre, padre, tutor..."></div>
+                    </div>
+                </div>
+
+                <div class="cs-bloque">
+                    <label>Decisión</label>
+                    <div class="cs-radios">
+                        <label class="cs-check"><input type="radio" name="cs-decision" value="Autorizo"><span>Autorizo</span></label>
+                        <label class="cs-check"><input type="radio" name="cs-decision" value="No autorizo"><span>No autorizo</span></label>
+                    </div>
+                </div>
+
+                <div class="cs-bloque">
+                    <h3 class="cs-subtitulo">Vista previa del documento</h3>
+                    <div id="cs-vista-previa" class="cs-vista"></div>
+                </div>
+
+                <div class="cs-bloque">
+                    <h3 class="cs-subtitulo">¿Cómo se firmará?</h3>
+                    <div class="cs-modos">
+                        <button type="button" class="cs-modo active" data-modo="digital">
+                            <strong>✍ Firma digital</strong>
+                            <span>El paciente firma en la pantalla</span>
+                        </button>
+                        <button type="button" class="cs-modo" data-modo="presencial">
+                            <strong>🖨 Imprimir y firmar presencial</strong>
+                            <span>Se imprime el formato y se firma en papel</span>
+                        </button>
+                    </div>
+
+                    <!-- FIRMA DIGITAL -->
+                    <div id="cs-pane-digital" class="cs-pane">
+                        <label class="cs-check cs-check-linea">
+                            <input type="checkbox" id="cs-acepta">
+                            <span>He leído y comprendido este consentimiento y mis preguntas fueron resueltas.</span>
+                        </label>
+                        <div class="hc-grid hc-grid-2">
+                            <div>
+                                <label id="cs-firma-firmante-label">Firma del paciente</label>
+                                <canvas id="cs-canvas-firmante" class="cs-canvas" width="600" height="200"></canvas>
+                                <button type="button" class="hc-btn secondary small" data-limpiar="firmante">Borrar firma</button>
+                            </div>
+                            <div>
+                                <label>Firma del profesional (opcional)</label>
+                                <canvas id="cs-canvas-profesional" class="cs-canvas" width="600" height="200"></canvas>
+                                <button type="button" class="hc-btn secondary small" data-limpiar="profesional">Borrar firma</button>
+                            </div>
+                        </div>
+                        <div class="hc-actions">
+                            <button type="button" class="hc-btn primary" id="cs-guardar-digital">Guardar consentimiento firmado</button>
+                        </div>
+                    </div>
+
+                    <!-- FIRMA PRESENCIAL -->
+                    <div id="cs-pane-presencial" class="cs-pane" hidden>
+                        <p class="hc-muted">Imprima el formato, entrégueselo al paciente para que lo lea y lo firme. Cuando esté firmado, regístrelo aquí.</p>
+                        <div class="hc-actions cs-acciones-izq">
+                            <button type="button" class="hc-btn outline" id="cs-imprimir">🖨 Imprimir formato</button>
+                            <button type="button" class="hc-btn primary" id="cs-registrar-fisico">Registrar como firmado en físico</button>
+                        </div>
+                    </div>
+
+                    <p id="cs-mensaje" class="hc-muted"></p>
+                </div>
+            </section>
+
+            <section class="hc-section">
+                <h2>Consentimientos del paciente</h2>
+                <div id="cs-historial" class="cs-historial">
+                    <p class="hc-empty">Aún no hay consentimientos registrados.</p>
+                </div>
+            </section>
+        </section>
+    </div>
+
+
+    </div>
+</main>
+
+<script>
+    window.PACIENTES_SMILE_CLOUD = {{ pacientes|default([])|tojson }};
+</script>
+<script src="{{ url_for('static', filename='JS/historial_clinico.js') }}"></script>
+</body>
+</html>
+
+
+{% endblock %}

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}
+Inicio | Smile Cloud
+{% endblock %}
+
+{% block content %}
+
+<main class="inicio-nuevo">
+
+    <section class="bienvenida">
+
+        <div class="bienvenida-icono">
+            <i class="bi bi-cloud-check"></i>
+        </div>
+
+        {% if session.get('rol') == 'Administrador' %}
+
+            <span class="bienvenida-etiqueta">
+                Panel administrativo
+            </span>
+
+            <h1>
+                ¡Hola, {{ session.get('usuario', '') }}!
+            </h1>
+
+            <p>
+                Bienvenido a <strong>Smile Cloud</strong>.
+                Desde este espacio puedes gestionar y supervisar
+                la información de la clínica de manera organizada.
+            </p>
+
+        {% elif session.get('rol') == 'Odontologo' %}
+
+            <span class="bienvenida-etiqueta">
+                Espacio clínico
+            </span>
+
+            <h1>
+                ¡Hola, {{ session.get('usuario', '') }}!
+            </h1>
+
+            <p>
+                Bienvenido a <strong>Smile Cloud</strong>.
+                Aquí puedes consultar y gestionar la información
+                necesaria para la atención y seguimiento de tus pacientes.
+            </p>
+
+        {% elif session.get('rol') == 'Recepcionista' %}
+
+            <span class="bienvenida-etiqueta">
+                Gestión de recepción
+            </span>
+
+            <h1>
+                ¡Hola, {{ session.get('usuario', '') }}!
+            </h1>
+
+            <p>
+                Bienvenido a <strong>Smile Cloud</strong>.
+                Desde aquí puedes organizar la información necesaria
+                para apoyar la gestión diaria de la clínica.
+            </p>
+
+        {% else %}
+
+            <span class="bienvenida-etiqueta">
+                Sistema de gestión odontológica
+            </span>
+
+            <h1>
+                ¡Bienvenido a Smile Cloud!
+            </h1>
+
+            <p>
+                Una plataforma orientada a facilitar la organización
+                y gestión de la información de la clínica.
+            </p>
+
+        {% endif %}
+
+    </section>
+
+
+    <section class="inicio-resumen">
+
+        <div class="resumen-encabezado">
+
+            <span>
+                <i class="bi bi-grid"></i>
+            </span>
+
+            <div>
+                <h2>
+                    Gestión integral
+                </h2>
+
+                <p>
+                    Smile Cloud centraliza la información y facilita
+                    las actividades administrativas y clínicas.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="resumen-elementos">
+
+            <div class="resumen-item">
+
+                <i class="bi bi-person-vcard"></i>
+
+                <div>
+                    <strong>Pacientes</strong>
+                    <small>
+                        Información y datos registrados.
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="resumen-item">
+
+                <i class="bi bi-calendar-check"></i>
+
+                <div>
+                    <strong>Citas</strong>
+                    <small>
+                        Organización de la agenda clínica.
+                    </small>
+                </div>
+
+            </div>
+
+
+            <div class="resumen-item">
+
+                <i class="bi bi-file-medical"></i>
+
+                <div>
+                    <strong>Ficha clínica</strong>
+                    <small>
+                        Consulta de información clínica.
+                    </small>
+                </div>
+
+            </div>
+
+
+            {% if session.get('rol') in ['Administrador', 'Recepcionista'] %}
+
+            <div class="resumen-item">
+
+                <i class="bi bi-person-badge"></i>
+
+                <div>
+                    <strong>Especialistas</strong>
+                    <small>
+                        Gestión del personal clínico.
+                    </small>
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if session.get('rol') == 'Administrador' %}
+
+            <div class="resumen-item">
+
+                <i class="bi bi-bar-chart"></i>
+
+                <div>
+                    <strong>Reportes</strong>
+                    <small>
+                        Información para seguimiento administrativo.
+                    </small>
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <div class="inicio-pie">
+
+        <i class="bi bi-shield-check"></i>
+
+        <span>
+            Información organizada para una gestión más eficiente de la clínica.
+        </span>
+
+    </div>
+
+</main>
+
+{% endblock %}

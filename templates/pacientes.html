@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pacientes | Smile Cloud
+{% endblock %}
+
+{% block content %}
+
+<main>
+
+<section class="contenedor-tabla">
+
+<div class="seccion-titulo">
+
+    <div>
+        <span class="titulo-pequeno">
+            Gestión clínica
+        </span>
+
+        <h2>
+            Gestión de Pacientes
+        </h2>
+    </div>
+
+    <div class="acciones-pacientes">
+
+        <a
+            href="/crear_paciente"
+            class="btn btn-success">
+            <i class="bi bi-person-plus"></i>
+            Crear paciente
+        </a>
+
+        <div class="buscador-pacientes">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="buscarPaciente"
+                class="form-control"
+                placeholder="Buscar por nombre, documento, correo..."
+                autocomplete="off">
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="tabla-responsive">
+
+    <table class="table table-hover" id="tablaPacientes">
+
+        <thead>
+
+            <tr>
+
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Documento</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Direccion</th>
+                <th>EPS</th>
+                <th>Acciones</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="listaPacientes">
+
+            {% for paciente in pacientes %}
+
+            <tr class="fila-paciente">
+
+               
+                <td>
+                    {{ paciente.nombre }}
+                </td>
+
+                <td>
+                    {{ paciente.apellido }}
+                </td>
+
+                <td>
+                    {{ paciente.numero_documento }}
+                </td>
+
+                <td>
+                    {{ paciente.correo }}
+                </td>
+
+                <td>
+                    {{ paciente.telefono }}
+                </td>
+
+                <td>
+                    {{paciente.direccion}}
+                </td>
+
+                <td>
+                    {{paciente.eps}}
+                </td>
+
+                <td>
+
+                    <div class="acciones-tabla">
+
+                        <a
+                            href="/editar/{{ paciente.id_paciente }}"
+                            class="btn btn-warning btn-sm">
+
+                            <i class="bi bi-pencil"></i>
+                            Editar
+
+                        </a>
+
+
+                        <a
+                            href="/eliminar/{{ paciente.id_paciente }}"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Está seguro de eliminar este paciente?')">
+
+                            <i class="bi bi-trash"></i>
+                            Eliminar
+
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td colspan="7" class="sin-registros">
+
+                    <i class="bi bi-people"></i>
+
+                    <p>
+                        No hay pacientes registrados.
+                    </p>
+
+                    <small>
+                        Puedes comenzar registrando un nuevo paciente.
+                    </small>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+            <tr
+                id="sinResultadosBusqueda"
+                style="display: none;">
+
+                <td colspan="7" class="sin-registros">
+
+                    <i class="bi bi-search"></i>
+
+                    <p>
+                        No se encontraron pacientes.
+                    </p>
+
+                    <small>
+                        Intenta con otro nombre, documento o correo.
+                    </small>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+</section>
+
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+const buscador = document.getElementById("buscarPaciente");
+const filas = document.querySelectorAll(".fila-paciente");
+const sinResultados = document.getElementById("sinResultadosBusqueda");
+
+if (buscador) {
+
+    buscador.addEventListener("input", function () {
+
+        const texto = this.value.toLowerCase().trim();
+
+        let encontrados = 0;
+
+        filas.forEach(function (fila) {
+
+            const contenido = fila.textContent.toLowerCase();
+
+            if (contenido.includes(texto)) {
+
+                fila.style.display = "";
+                encontrados++;
+
+            } else {
+
+                fila.style.display = "none";
+
+            }
+
+        });
+
+        if (sinResultados) {
+
+            if (texto !== "" && encontrados === 0) {
+
+                sinResultados.style.display = "";
+
+            } else {
+
+                sinResultados.style.display = "none";
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

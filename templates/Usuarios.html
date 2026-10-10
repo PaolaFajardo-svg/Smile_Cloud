@@ -1,0 +1,724 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios | Smile Cloud{% endblock %}
+
+{% block content %}
+
+<div class="usuarios-container">
+    <div class="encabezado-usuarios">
+
+        <div>
+            <span class="etiqueta-usuarios">
+                <i class="bi bi-shield-lock"></i>
+                Administración
+            </span>
+
+            <h1>Gestión de Usuarios</h1>
+
+            <p>
+                Administra los usuarios y roles que tienen acceso a Smile Cloud.
+            </p>
+        </div>
+
+        <button class="btn-nuevo-usuario" type="button" onclick="abrirModalUsuario()">
+            <i class="bi bi-person-plus"></i>
+            Nuevo usuario
+        </button>
+
+    </div>
+
+    <div class="tarjetas-usuarios">
+
+        <div class="tarjeta-usuario">
+            <div class="icono-tarjeta-usuario">
+                <i class="bi bi-people"></i>
+            </div>
+
+            <div>
+                <span class="numero-usuario">04</span>
+                <span class="nombre-tarjeta-usuario">Usuarios registrados</span>
+            </div>
+        </div>
+
+
+        <div class="tarjeta-usuario">
+            <div class="icono-tarjeta-usuario activo">
+                <i class="bi bi-person-check"></i>
+            </div>
+
+            <div>
+                <span class="numero-usuario">04</span>
+                <span class="nombre-tarjeta-usuario">Usuarios activos</span>
+            </div>
+        </div>
+
+
+        <div class="tarjeta-usuario">
+            <div class="icono-tarjeta-usuario inactivo">
+                <i class="bi bi-person-x"></i>
+            </div>
+
+            <div>
+                <span class="numero-usuario">00</span>
+                <span class="nombre-tarjeta-usuario">Usuarios inactivos</span>
+            </div>
+        </div>
+
+    </div>
+
+    <section class="seccion-usuarios">
+
+        <div class="cabecera-usuarios">
+
+            <div>
+                <h2>
+                    <i class="bi bi-list-ul"></i>
+                    Usuarios registrados
+                </h2>
+
+                <p>
+                    Consulta y administra las cuentas del sistema.
+                </p>
+            </div>
+
+            <div class="buscador-usuarios">
+
+                <i class="bi bi-search"></i>
+
+                <input
+                    type="text"
+                    id="buscarUsuario"
+                    placeholder="Buscar usuario..."
+                    onkeyup="buscarUsuarios()"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="tabla-responsive-usuarios">
+
+            <table class="tabla-usuarios" id="tablaUsuarios">
+
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Correo electrónico</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+
+                        <td>
+                            <div class="usuario-info">
+
+                                <div class="avatar-usuario">
+                                    A
+                                </div>
+
+                                <div>
+                                    <strong>admin.smilecloud</strong>
+                                    <span>Administrador principal</span>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+                            admin@smilecloud.com
+                        </td>
+
+                        <td>
+                            <span class="rol-usuario administrador">
+                                Administrador
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="estado-usuario activo">
+                                <i class="bi bi-circle-fill"></i>
+                                Activo
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="acciones-usuario">
+
+                                <button
+                                    class="btn-accion editar"
+                                    title="Editar usuario"
+                                    onclick="editarUsuario('admin.smilecloud')"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button
+                                    class="btn-accion desactivar"
+                                    title="Desactivar usuario"
+                                    onclick="cambiarEstadoUsuario('admin.smilecloud')"
+                                >
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>
+                            <div class="usuario-info">
+
+                                <div class="avatar-usuario">
+                                    L
+                                </div>
+
+                                <div>
+                                    <strong>laura.gomez</strong>
+                                    <span>Cuenta profesional</span>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+                            laura.gomez@smilecloud.com
+                        </td>
+
+                        <td>
+                            <span class="rol-usuario odontologo">
+                                Odontólogo
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="estado-usuario activo">
+                                <i class="bi bi-circle-fill"></i>
+                                Activo
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="acciones-usuario">
+
+                                <button
+                                    class="btn-accion editar"
+                                    title="Editar usuario"
+                                    onclick="editarUsuario('laura.gomez')"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button
+                                    class="btn-accion desactivar"
+                                    title="Desactivar usuario"
+                                    onclick="cambiarEstadoUsuario('laura.gomez')"
+                                >
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                    <tr>
+
+                        <td>
+                            <div class="usuario-info">
+
+                                <div class="avatar-usuario">
+                                    C
+                                </div>
+
+                                <div>
+                                    <strong>carlos.martinez</strong>
+                                    <span>Cuenta profesional</span>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+                            carlos.martinez@smilecloud.com
+                        </td>
+
+                        <td>
+                            <span class="rol-usuario odontologo">
+                                Odontólogo
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="estado-usuario activo">
+                                <i class="bi bi-circle-fill"></i>
+                                Activo
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="acciones-usuario">
+
+                                <button
+                                    class="btn-accion editar"
+                                    title="Editar usuario"
+                                    onclick="editarUsuario('carlos.martinez')"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button
+                                    class="btn-accion desactivar"
+                                    title="Desactivar usuario"
+                                    onclick="cambiarEstadoUsuario('carlos.martinez')"
+                                >
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+                    <tr>
+
+                        <td>
+                            <div class="usuario-info">
+
+                                <div class="avatar-usuario">
+                                    S
+                                </div>
+
+                                <div>
+                                    <strong>sofia.perez</strong>
+                                    <span>Personal administrativo</span>
+                                </div>
+
+                            </div>
+                        </td>
+
+                        <td>
+                            sofia.perez@smilecloud.com
+                        </td>
+
+                        <td>
+                            <span class="rol-usuario recepcionista">
+                                Recepcionista
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="estado-usuario activo">
+                                <i class="bi bi-circle-fill"></i>
+                                Activo
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="acciones-usuario">
+
+                                <button
+                                    class="btn-accion editar"
+                                    title="Editar usuario"
+                                    onclick="editarUsuario('sofia.perez')"
+                                >
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button
+                                    class="btn-accion desactivar"
+                                    title="Desactivar usuario"
+                                    onclick="cambiarEstadoUsuario('sofia.perez')"
+                                >
+                                    <i class="bi bi-person-dash"></i>
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+
+            <!-- MENSAJE SIN RESULTADOS -->
+            <div id="sinResultadosUsuarios" class="sin-resultados-usuarios">
+
+                <i class="bi bi-search"></i>
+
+                <h3>No se encontraron usuarios</h3>
+
+                <p>
+                    Intenta realizar la búsqueda con otro nombre o correo.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<div id="modalUsuario" class="modal-usuario">
+
+    <div class="contenido-modal-usuario">
+
+        <div class="encabezado-modal-usuario">
+
+            <div>
+                <span class="icono-modal-usuario">
+                    <i class="bi bi-person-plus"></i>
+                </span>
+
+                <div>
+                    <h2>Nuevo usuario</h2>
+                    <p>Registra una nueva cuenta en Smile Cloud.</p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="cerrar-modal-usuario"
+                onclick="cerrarModalUsuario()"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+
+        <form id="formUsuario" onsubmit="guardarUsuario(event)">
+
+            <div class="formulario-usuarios">
+
+                <div class="campo-usuario">
+
+                    <label for="nombreUsuario">
+                        Nombre de usuario
+                    </label>
+
+                    <div class="input-usuario">
+
+                        <i class="bi bi-person"></i>
+
+                        <input
+                            type="text"
+                            id="nombreUsuario"
+                            name="usuario"
+                            placeholder="Ej. maria.garcia"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="campo-usuario">
+
+                    <label for="correoUsuario">
+                        Correo electrónico
+                    </label>
+
+                    <div class="input-usuario">
+
+                        <i class="bi bi-envelope"></i>
+
+                        <input
+                            type="email"
+                            id="correoUsuario"
+                            name="correo"
+                            placeholder="usuario@smilecloud.com"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="campo-usuario">
+
+                    <label for="contrasenaUsuario">
+                        Contraseña
+                    </label>
+
+                    <div class="input-usuario">
+
+                        <i class="bi bi-lock"></i>
+
+                        <input
+                            type="password"
+                            id="contrasenaUsuario"
+                            name="contrasena"
+                            placeholder="Ingrese una contraseña"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="campo-usuario">
+
+                    <label for="rolUsuario">
+                        Rol
+                    </label>
+
+                    <div class="input-usuario">
+
+                        <i class="bi bi-shield-check"></i>
+
+                        <select id="rolUsuario" name="id_rol" required>
+
+                            <option value="">
+                                Seleccione un rol
+                            </option>
+
+                            <option value="1">
+                                Administrador
+                            </option>
+
+                            <option value="2">
+                                Odontólogo
+                            </option>
+
+                            <option value="3">
+                                Recepcionista
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="informacion-modal-usuario">
+
+                <i class="bi bi-info-circle"></i>
+
+                <span>
+                    El rol determinará las funciones y módulos disponibles
+                    para el usuario dentro del sistema.
+                </span>
+
+            </div>
+
+
+            <div class="botones-modal-usuario">
+
+                <button
+                    type="button"
+                    class="btn-cancelar-usuario"
+                    onclick="cerrarModalUsuario()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn-guardar-usuario"
+                >
+                    <i class="bi bi-check-lg"></i>
+                    Registrar usuario
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   BUSCAR USUARIOS
+========================= */
+
+function buscarUsuarios() {
+
+    const input = document.getElementById("buscarUsuario");
+    const filtro = input.value.toLowerCase().trim();
+
+    const tabla = document.getElementById("tablaUsuarios");
+    const filas = tabla.querySelectorAll("tbody tr");
+
+    const mensaje = document.getElementById("sinResultadosUsuarios");
+
+    let encontrados = 0;
+
+    filas.forEach(function(fila) {
+
+        const texto = fila.textContent.toLowerCase();
+
+        if (texto.includes(filtro)) {
+
+            fila.style.display = "";
+            encontrados++;
+
+        } else {
+
+            fila.style.display = "none";
+
+        }
+
+    });
+
+
+    if (encontrados === 0) {
+
+        mensaje.style.display = "flex";
+
+    } else {
+
+        mensaje.style.display = "none";
+
+    }
+
+}
+
+
+/* =========================
+   ABRIR MODAL
+========================= */
+
+function abrirModalUsuario() {
+
+    const modal = document.getElementById("modalUsuario");
+
+    modal.classList.add("mostrar");
+
+    document.body.style.overflow = "hidden";
+
+}
+
+
+/* =========================
+   CERRAR MODAL
+========================= */
+
+function cerrarModalUsuario() {
+
+    const modal = document.getElementById("modalUsuario");
+
+    modal.classList.remove("mostrar");
+
+    document.body.style.overflow = "";
+
+}
+
+
+/* =========================
+   CERRAR AL HACER CLICK AFUERA
+========================= */
+
+window.addEventListener("click", function(event) {
+
+    const modal = document.getElementById("modalUsuario");
+
+    if (event.target === modal) {
+
+        cerrarModalUsuario();
+
+    }
+
+});
+
+
+/* =========================
+   CERRAR CON ESCAPE
+========================= */
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+
+        cerrarModalUsuario();
+
+    }
+
+});
+
+
+/* =========================
+   GUARDAR USUARIO
+========================= */
+
+function guardarUsuario(event) {
+
+    event.preventDefault();
+
+    alert(
+        "La interfaz está lista. " +
+        "La conexión con la base de datos se realizará en el siguiente paso."
+    );
+
+    document.getElementById("formUsuario").reset();
+
+    cerrarModalUsuario();
+
+}
+
+
+/* =========================
+   EDITAR USUARIO
+========================= */
+
+function editarUsuario(usuario) {
+
+    alert(
+        "Editar usuario: " + usuario +
+        "\n\nEsta función se conectará con la base de datos posteriormente."
+    );
+
+}
+
+
+/* =========================
+   CAMBIAR ESTADO
+========================= */
+
+function cambiarEstadoUsuario(usuario) {
+
+    const confirmar = confirm(
+        "¿Deseas cambiar el estado del usuario " +
+        usuario +
+        "?"
+    );
+
+    if (confirmar) {
+
+        alert(
+            "El cambio de estado se conectará con la base de datos posteriormente."
+        );
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+
+{% block title %}
+Citas | Smile Cloud
+{% endblock %}
+
+{% block content %}
+{% if request.args.get('error') %}
+
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+
+    <i class="bi bi-exclamation-triangle"></i>
+
+    {{ request.args.get('error') }}
+
+    <button type="button" class="btn-close" data-bs-dismiss="alert">
+    </button>
+
+</div>
+
+{% endif %}
+<main>
+
+    <section class="contenedor-citas">
+        <div class="encabezado-citas">
+
+            <div>
+
+                <span class="titulo-pequeno">
+                    Gestión clínica
+                </span>
+
+                <h2>
+                    Citas odontológicas
+                </h2>
+
+                <p>
+                    Consulta y gestiona las citas registradas en Smile Cloud.
+                </p>
+
+            </div>
+
+            <button type="button" class="btn-nueva-cita" onclick="abrirNuevaCita()">
+                <i class="bi bi-plus-lg"></i> Nueva cita
+            </button>
+
+        </div>
+
+        <div class="filtro-citas">
+
+            <div class="filtro-titulo">
+
+                <i class="bi bi-calendar3"></i>
+
+                <div>
+                    <strong>Buscar citas</strong>
+
+                    <span>
+                        Consulta las citas según una fecha específica.
+                    </span>
+                </div>
+
+            </div>
+
+
+            <form action="{{ url_for('citas') }}" method="GET" class="form-busqueda-citas">
+
+                <div class="campo-fecha">
+
+                    <label for="fecha">
+                        Fecha
+                    </label>
+
+                    <input type="date" id="fecha" name="fecha" value="{{ fecha_busqueda }}">
+
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-buscar-cita">
+
+                    <i class="bi bi-search"></i>
+                    Buscar
+
+                </button>
+
+
+                <a href="{{ url_for('citas') }}" class="btn btn-outline-secondary btn-mostrar-todas">
+
+                    <i class="bi bi-arrow-repeat"></i>
+                    Mostrar todas
+
+                </a>
+
+            </form>
+
+        </div>
+
+        <div class="tarjeta-citas">
+
+            <div class="cabecera-tabla-citas">
+
+                <div>
+
+                    <h3>
+                        Listado de citas
+                    </h3>
+
+                    <span>
+                        {{ citas|length }} registro{% if citas|length != 1 %}s{% endif %}
+                    </span>
+
+                </div>
+
+                <div class="icono-citas">
+
+                    <i class="bi bi-calendar-check"></i>
+
+                </div>
+
+            </div>
+
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-citas">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Paciente</th>
+                            <th>Especialista</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Estado y acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for cita in citas %}
+
+                        <tr>
+
+                            <td>
+                                <span class="id-cita">
+                                    {{ cita.id_consulta_clinica }}
+                                </span>
+                            </td>
+
+
+                            <td>
+                                <strong class="nombre-paciente-cita">
+                                    {{ cita.paciente }}
+                                </strong>
+                            </td>
+
+
+                            <td>
+                                {{ cita.especialista }}
+                            </td>
+
+
+                            <td>
+                                <span class="fecha-cita">
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ cita.fecha }}
+                                </span>
+                            </td>
+
+
+                            <td>
+                                <span class="hora-cita">
+                                    <i class="bi bi-clock"></i>
+                                    {{ cita.hora }}
+                                </span>
+                            </td>
+
+
+                            <td class="estado-cita">
+
+                                <div class="nombre-estado">
+
+                                    {% if cita.estado == "Programada" %}
+
+                                    <span class="estado-programada">
+                                        <i class="bi bi-calendar-event"></i>
+                                        {{ cita.estado }}
+                                    </span>
+
+                                    {% elif cita.estado == "Confirmada" %}
+
+                                    <span class="estado-confirmada">
+                                        <i class="bi bi-check-circle"></i>
+                                        {{ cita.estado }}
+                                    </span>
+
+                                    {% elif cita.estado == "Pendiente" %}
+
+                                    <span class="estado-pendiente">
+                                        <i class="bi bi-hourglass-split"></i>
+                                        {{ cita.estado }}
+                                    </span>
+
+                                    {% elif cita.estado == "Finalizada" %}
+
+                                    <span class="estado-finalizada">
+                                        <i class="bi bi-check2-all"></i>
+                                        {{ cita.estado }}
+                                    </span>
+
+                                    {% elif cita.estado == "Cancelada" %}
+
+                                    <span class="estado-cancelada">
+                                        <i class="bi bi-x-circle"></i>
+                                        {{ cita.estado }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                {% if cita.estado != "Finalizada" and cita.estado != "Cancelada" %}
+
+                                <div class="acciones-estado">
+
+                                    {% if cita.estado == "Pendiente" %}
+                                    <form action="{{ url_for('confirmar_cita', id=cita.id_consulta_clinica) }}" method="POST" class="form-confirmar" onsubmit="return confirmarProgramacion();">
+                                        <button type="submit" class="btn-confirmar">
+                                            <i class="bi bi-check-circle"></i> Confirmar
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    <button type="button" class="btn-cancelar btn-abrir-cancelacion"
+                                        data-url="{{ url_for('cancelar_cita', id=cita.id_consulta_clinica) }}"
+                                        data-paciente="{{ cita.paciente|e }}"
+                                        data-fecha="{{ cita.fecha|e }}"
+                                        data-hora="{{ cita.hora|e }}"
+                                        data-id="{{ cita.id_consulta_clinica }}">
+                                        <i class="bi bi-x-circle"></i>
+                                        Cancelar
+                                    </button>
+
+
+                                    <button type="button" class="btn-reagendar"
+                                        onclick="abrirReagendar('{{ cita.id_consulta_clinica }}', '{{ cita.fecha }}', '{{ cita.hora }}')">
+
+                                        <i class="bi bi-calendar2-plus"></i>
+                                        Reagendar
+
+                                    </button>
+
+                                </div>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                        {% if not citas %}
+
+                        <tr>
+
+                            <td colspan="6" class="sin-citas">
+
+                                <div class="estado-vacio-citas">
+
+                                    <div class="icono-vacio-citas">
+
+                                        <i class="bi bi-calendar-x"></i>
+
+                                    </div>
+
+                                    <strong>
+                                        No hay citas disponibles
+                                    </strong>
+
+                                    <span>
+                                        No se encontraron citas para la fecha seleccionada.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <div id="modalCancelarCita" class="modal-cancelar-cita" aria-hidden="true">
+        <div class="contenido-cancelar-cita" role="dialog" aria-modal="true" aria-labelledby="tituloCancelarCita">
+            <button type="button" class="cerrar-cancelar-cita" onclick="cerrarCancelarCita()" aria-label="Cerrar ventana">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="icono-cancelar-cita-grande"><i class="bi bi-calendar-x"></i></div>
+            <span class="subtitulo-cancelar-cita">GESTIÓN DE CITAS</span>
+            <h3 id="tituloCancelarCita">¿Cancelar esta cita?</h3>
+            <p class="texto-cancelar-cita">Estás a punto de cancelar la siguiente cita. Esta acción cambiará su estado a <strong>Cancelada</strong>.</p>
+            <div class="resumen-cancelar-cita">
+                <div><span><i class="bi bi-person"></i> Paciente</span><strong id="cancelarPaciente">—</strong></div>
+                <div><span><i class="bi bi-calendar3"></i> Fecha</span><strong id="cancelarFecha">—</strong></div>
+                <div><span><i class="bi bi-clock"></i> Hora</span><strong id="cancelarHora">—</strong></div>
+                <div><span><i class="bi bi-hash"></i> Cita</span><strong id="cancelarId">—</strong></div>
+            </div>
+            <div class="aviso-cancelar-cita"><i class="bi bi-info-circle"></i><span>Si solo necesitas cambiar el horario, puedes cerrar esta ventana y usar <strong>Reagendar</strong>.</span></div>
+            <form id="formCancelarCita" method="POST">
+                <div class="botones-cancelar-cita">
+                    <button type="button" class="btn-volver-cancelacion" onclick="cerrarCancelarCita()">No, volver</button>
+                    <button type="submit" class="btn-confirmar-cancelacion"><i class="bi bi-x-circle"></i> Sí, cancelar cita</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalNuevaCita" class="modal-nueva-cita" aria-hidden="true">
+      <div class="contenido-nueva-cita" role="dialog" aria-modal="true" aria-labelledby="tituloNuevaCita">
+        <button type="button" class="cerrar-nueva-cita" onclick="cerrarNuevaCita()" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <div class="encabezado-nueva-cita">
+          <div class="icono-nueva-cita"><i class="bi bi-calendar2-plus"></i></div>
+          <div><span class="subtitulo-modal-cita">AGENDA CLÍNICA</span><h3 id="tituloNuevaCita">Programar nueva cita</h3><p>Completa los datos para reservar la atención odontológica.</p></div>
+        </div>
+        <form action="{{ url_for('crear_cita') }}" method="POST" id="formNuevaCita">
+          <div class="campos-nueva-cita">
+            <div class="campo-nueva-cita campo-completo"><label for="pacienteCita">Paciente</label><div class="input-icono-cita"><i class="bi bi-person"></i><select id="pacienteCita" name="id_paciente" required><option value="">Selecciona un paciente</option>{% for paciente in pacientes %}<option value="{{ paciente.id_paciente }}">{{ paciente.nombre }} {{ paciente.apellido }} — {{ paciente.numero_documento }}</option>{% endfor %}</select></div></div>
+            <div class="campo-nueva-cita"><label for="fechaCita">Fecha de la cita</label><div class="input-icono-cita"><i class="bi bi-calendar3"></i><input type="date" id="fechaCita" name="fecha" required></div></div>
+            <div class="campo-nueva-cita"><label>Jornada</label><div class="selector-jornada"><label class="opcion-jornada"><input type="radio" name="jornada" value="manana" checked onchange="actualizarHoras()"><span><i class="bi bi-sunrise"></i> Mañana</span></label><label class="opcion-jornada"><input type="radio" name="jornada" value="tarde" onchange="actualizarHoras()"><span><i class="bi bi-sunset"></i> Tarde</span></label></div></div>
+            <div class="campo-nueva-cita"><label for="horaCita">Hora disponible</label><div class="input-icono-cita"><i class="bi bi-clock"></i><select id="horaCita" name="hora" required></select></div><small>Selecciona una hora de la jornada.</small></div>
+            <div class="campo-nueva-cita"><label for="especialistaCita">Odontólogo / especialista</label><div class="input-icono-cita"><i class="bi bi-person-badge"></i><select id="especialistaCita" name="id_funcionario" required><option value="">Selecciona un especialista</option>{% for funcionario in funcionarios %}<option value="{{ funcionario.id_funcionario }}">{{ funcionario.nombre }} {{ funcionario.apellido }}</option>{% endfor %}</select></div></div>
+            <div class="campo-nueva-cita"><label for="consultorioCita">Consultorio</label><div class="input-icono-cita"><i class="bi bi-hospital"></i><select id="consultorioCita" name="id_consultorio" required><option value="">Selecciona consultorio</option>{% for consultorio in consultorios %}{% if consultorio.estado == 'Activo' %}<option value="{{ consultorio.id_consultorio }}">{{ consultorio.nombre }}{% if consultorio.ubicacion %} — {{ consultorio.ubicacion }}{% endif %}</option>{% endif %}{% endfor %}</select></div></div>
+            <div class="campo-nueva-cita campo-completo"><label for="motivoCita">Motivo de la consulta</label><div class="input-icono-cita"><i class="bi bi-chat-left-text"></i><select id="motivoCita" name="motivo" required><option value="">Selecciona el motivo</option><option>Valoración odontológica</option><option>Limpieza dental</option><option>Dolor dental</option><option>Restauración dental</option><option>Control de ortodoncia</option><option>Endodoncia</option><option>Revisión / control</option><option>Urgencia odontológica</option><option>Otro</option></select></div></div>
+            <div class="nota-nueva-cita campo-completo"><i class="bi bi-info-circle"></i> La cita quedará registrada como <strong>Pendiente</strong>. Deberás confirmarla para dejarla programada.</div>
+          </div>
+          <div class="botones-nueva-cita"><button type="button" class="btn-cita-secundario" onclick="cerrarNuevaCita()">Cancelar</button><button type="submit" class="btn-cita-guardar"><i class="bi bi-check2-circle"></i> Registrar cita</button></div>
+        </form>
+      </div>
+    </div>
+
+    <div id="modalReagendar" class="modal-reagendar" aria-hidden="true">
+
+        ```
+        <div class="contenido-reagendar">
+
+            <button type="button" class="cerrar-reagendar" onclick="cerrarReagendar()" aria-label="Cerrar">
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+
+            <div class="encabezado-reagendar">
+
+                <div class="icono-modal-reagendar">
+
+                    <i class="bi bi-calendar2-plus"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>
+                        Reagendar cita
+                    </h3>
+
+                    <p>
+                        Selecciona la nueva fecha y hora de la cita.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form id="formReagendar" method="POST">
+
+                <div class="campos-reagendar">
+
+                    <div class="campo-reagendar">
+
+                        <label for="nuevaFecha">
+                            Nueva fecha
+                        </label>
+
+                        <div class="input-icono">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            <input type="date" id="nuevaFecha" name="fecha" required>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="campo-reagendar">
+
+                        <label for="nuevaHora">
+                            Nueva hora
+                        </label>
+
+                        <div class="input-icono">
+
+                            <i class="bi bi-clock"></i>
+
+                            <input type="time" id="nuevaHora" name="hora" required>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="botones-reagendar">
+
+                    <button type="button" class="btn btn-outline-secondary" onclick="cerrarReagendar()">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit" class="btn btn-primary btn-guardar-reagendar">
+
+                        <i class="bi bi-check-lg"></i>
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+    function abrirNuevaCita() {
+      const modal = document.getElementById("modalNuevaCita");
+      const fecha = document.getElementById("fechaCita");
+      const hoy = new Date();
+      fecha.min = hoy.getFullYear()+"-"+String(hoy.getMonth()+1).padStart(2,"0")+"-"+String(hoy.getDate()).padStart(2,"0");
+      if (!fecha.value) fecha.value = fecha.min;
+      actualizarHoras();
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden","false");
+    }
+    function cerrarNuevaCita() {
+      const modal=document.getElementById("modalNuevaCita");
+      modal.style.display="none"; modal.setAttribute("aria-hidden","true");
+    }
+    function actualizarHoras() {
+      const jornada=document.querySelector('input[name="jornada"]:checked').value;
+      const select=document.getElementById("horaCita"), actual=select.value;
+      const manana=["07:00","07:30","08:00","08:30","09:00","09:30","10:00","10:30","11:00","11:30"];
+      const tarde=["12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00"];
+      const horas=jornada==="manana"?manana:tarde;
+      select.innerHTML=horas.map(h=>'<option value="'+h+'">'+formatoHoraCita(h)+'</option>').join("");
+      if(horas.includes(actual)) select.value=actual;
+    }
+    function formatoHoraCita(h) {
+      const p=h.split(":").map(Number), sufijo=p[0]<12?"a. m.":"p. m.";
+      return (p[0]%12||12)+":"+String(p[1]).padStart(2,"0")+" "+sufijo;
+    }
+    document.addEventListener("click",function(e){const m=document.getElementById("modalNuevaCita");if(e.target===m)cerrarNuevaCita();});
+
+
+    function abrirReagendar(id, fecha, hora) {
+
+    const modal = document.getElementById("modalReagendar");
+    const formulario = document.getElementById("formReagendar");
+    const nuevaFecha = document.getElementById("nuevaFecha");
+    const nuevaHora = document.getElementById("nuevaHora");
+
+    const hoy = new Date();
+
+    const fechaMinima =
+        hoy.getFullYear() + "-" +
+        String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
+        String(hoy.getDate()).padStart(2, "0");
+
+    nuevaFecha.min = fechaMinima;
+
+    nuevaFecha.value = fecha;
+    nuevaHora.value = hora;
+
+    formulario.action = "/reagendar_cita/" + id;
+
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+}
+
+    function cerrarReagendar() {
+
+        const modal = document.getElementById("modalReagendar");
+
+        modal.style.display = "none";
+        modal.setAttribute("aria-hidden", "true");
+
+    }
+
+
+    function confirmarProgramacion() {
+        return confirm("¿Deseas confirmar esta cita y dejarla en estado Programada?");
+    }
+
+    function abrirCancelarCita(boton) {
+        const modal = document.getElementById("modalCancelarCita");
+        document.getElementById("formCancelarCita").action = boton.dataset.url;
+        document.getElementById("cancelarPaciente").textContent = boton.dataset.paciente || "Paciente";
+        document.getElementById("cancelarFecha").textContent = boton.dataset.fecha || "—";
+        document.getElementById("cancelarHora").textContent = boton.dataset.hora || "—";
+        document.getElementById("cancelarId").textContent = "#" + (boton.dataset.id || "—");
+        modal.style.display = "flex";
+        modal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-cita-abierto");
+    }
+
+    function cerrarCancelarCita() {
+        const modal = document.getElementById("modalCancelarCita");
+        modal.style.display = "none";
+        modal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-cita-abierto");
+    }
+
+    document.addEventListener("click", function(event) {
+        const boton = event.target.closest(".btn-abrir-cancelacion");
+        if (boton) abrirCancelarCita(boton);
+        if (event.target === document.getElementById("modalCancelarCita")) cerrarCancelarCita();
+    });
+
+
+    window.addEventListener("click", function (event) {
+
+        const modal = document.getElementById("modalReagendar");
+
+        if (event.target === modal) {
+
+            cerrarReagendar();
+
+        }
+
+    });
+
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+            cerrarReagendar();
+            cerrarNuevaCita();
+            cerrarCancelarCita();
+        }
+
+    });
+
+    const campoFecha = document.getElementById("nuevaFecha");
+
+    const hoy = new Date();
+
+    const fechaMinima =
+        hoy.getFullYear() + "-" +
+        String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
+        String(hoy.getDate()).padStart(2, "0");
+
+    campoFecha.min = fechaMinima;
+
+</script>
+
+{% endblock %}
