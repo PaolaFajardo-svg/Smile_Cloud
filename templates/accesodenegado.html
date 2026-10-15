@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Acceso denegado | Smile Cloud{% endblock %}
+{% block content %}
+<main class="sc-users-page">
+  <section class="scu-directory" style="padding:36px;text-align:center">
+    <h1 style="color:#126782">Acceso restringido</h1>
+    <p>{{ mensaje or 'No tienes permiso para acceder a esta sección.' }}</p>
+    <a class="scu-btn scu-btn-primary" href="{{ url_for('home') }}">Volver al inicio</a>
+  </section>
+</main>
+{% endblock %}

@@ -1,724 +1,270 @@
 {% extends "base.html" %}
-
 {% block title %}Usuarios | Smile Cloud{% endblock %}
-
 {% block content %}
+<main class="sc-users-page">
+  <header class="sc-users-header">
+    <div>
+      <p class="sc-users-eyebrow">PANEL DE ADMINISTRACIÓN</p>
+      <h1>Usuarios del sistema</h1>
+      <p>Administra los accesos del equipo de Smile Cloud desde un solo lugar.</p>
+    </div>
+    <button class="scu-btn scu-btn-primary" type="button" data-open-user-modal>
+      <span aria-hidden="true">＋</span> Crear usuario
+    </button>
+  </header>
 
-<div class="usuarios-container">
-    <div class="encabezado-usuarios">
+  {% if mensaje %}
+    <div class="scu-alert scu-alert-success" role="status">{{ mensaje }}</div>
+  {% endif %}
+  {% if error %}
+    <div class="scu-alert scu-alert-error" role="alert">{{ error }}</div>
+  {% endif %}
 
-        <div>
-            <span class="etiqueta-usuarios">
-                <i class="bi bi-shield-lock"></i>
-                Administración
+  <section class="scu-summary-grid">
+    <article class="scu-summary-card">
+      <span class="scu-summary-label">Usuarios registrados</span>
+      <strong>{{ usuarios|length }}</strong>
+      <small>Cuentas del sistema</small>
+    </article>
+    <article class="scu-summary-card">
+      <span class="scu-summary-label">Activos</span>
+      <strong>{{ usuarios|selectattr('estado', 'equalto', 'Activo')|list|length }}</strong>
+      <small>Con acceso habilitado</small>
+    </article>
+    <article class="scu-summary-card">
+      <span class="scu-summary-label">Odontólogos</span>
+      <strong>{{ usuarios|selectattr('rol', 'equalto', 'Odontologo')|list|length }}</strong>
+      <small>Equipo clínico</small>
+    </article>
+    <article class="scu-summary-card">
+      <span class="scu-summary-label">Recepcionistas</span>
+      <strong>{{ usuarios|selectattr('rol', 'equalto', 'Recepcionista')|list|length }}</strong>
+      <small>Equipo de recepción</small>
+    </article>
+  </section>
+
+  <section class="scu-directory">
+    <div class="scu-directory-heading">
+      <div>
+        <h2>Directorio del equipo</h2>
+        <p>Consulta las cuentas, sus roles y su estado actual.</p>
+      </div>
+      <div class="scu-search-wrap">
+        <label class="scu-visually-hidden" for="scu-search">Buscar usuarios</label>
+        <input id="scu-search" type="search" placeholder="Buscar por nombre, usuario o correo…">
+      </div>
+    </div>
+
+    <div class="scu-filter-row">
+      <label for="scu-role-filter">Filtrar por rol</label>
+      <select id="scu-role-filter">
+        <option value="">Todos los roles</option>
+        {% for rol in roles %}
+          <option value="{{ rol.nombre }}">{{ rol.nombre }}</option>
+        {% endfor %}
+      </select>
+      <label for="scu-status-filter">Estado</label>
+      <select id="scu-status-filter">
+        <option value="">Todos</option>
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+    </div>
+
+    <div class="scu-table-scroll">
+      <table class="scu-table" id="scu-users-table">
+        <thead>
+          <tr>
+            <th>Funcionario</th>
+            <th>Cuenta</th>
+            <th>Rol</th>
+            <th>Contacto</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios %}
+          <tr data-role="{{ u.rol }}" data-status="{{ u.estado }}">
+            <td>
+              <div class="scu-person-cell">
+                <span class="scu-avatar">{{ (u.nombre or u.usuario or '?')[0]|upper }}{{ (u.apellido or '')[0]|upper }}</span>
+                <span><strong>{{ u.nombre }} {{ u.apellido }}</strong><small>{{ u.tipo_documento }} · {{ u.numero_documento }}</small></span>
+              </div>
+            </td>
+            <td><strong>{{ u.usuario }}</strong><small class="scu-table-subline">ID #{{ u.id_usuario }}</small></td>
+            <td><span class="scu-role-pill scu-role-{{ u.rol|lower|replace('ó','o')|replace(' ','-') }}">{{ u.rol }}</span></td>
+            <td><span>{{ u.correo }}</span><small class="scu-table-subline">{{ u.telefono or 'Sin teléfono' }}</small></td>
+            <td><span class="scu-status-pill {% if u.estado == 'Activo' %}is-active{% else %}is-inactive{% endif %}"><i></i>{{ u.estado }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="scu-empty">Todavía no hay usuarios para mostrar.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p class="scu-no-results" id="scu-no-results" hidden>No hay usuarios que coincidan con la búsqueda.</p>
+    </div>
+    <footer class="scu-directory-footer"><span id="scu-results-count">{{ usuarios|length }} usuarios</span><span>El acceso depende del rol asignado.</span></footer>
+  </section>
+</main>
+
+<div class="scu-modal" id="scu-user-modal" hidden>
+  <div class="scu-modal-backdrop" data-close-user-modal></div>
+  <section class="scu-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="scu-modal-title">
+    <header class="scu-modal-header">
+      <div>
+        <p class="scu-users-eyebrow">NUEVA CUENTA</p>
+        <h2 id="scu-modal-title">Crear usuario</h2>
+        <p>Registra los datos del funcionario y define su acceso al sistema.</p>
+      </div>
+      <button class="scu-close" type="button" data-close-user-modal aria-label="Cerrar">×</button>
+    </header>
+    <div class="scu-modal-progress"><span id="scu-modal-progress-bar"></span></div>
+    <div class="scu-step-indicators">
+      <span class="is-current" data-step-indicator="1"><b>1</b> Funcionario</span>
+      <span data-step-indicator="2"><b>2</b> Cuenta</span>
+      <span data-step-indicator="3"><b>3</b> Rol</span>
+    </div>
+
+    <form method="POST" action="{{ url_for('usuarios') }}" id="scu-create-form">
+      <div class="scu-form-step is-current" data-form-step="1">
+        <h3>Información del funcionario</h3>
+        <p class="scu-step-description">Datos personales de la persona que usará Smile Cloud.</p>
+        <div class="scu-form-grid">
+          <div class="scu-field"><label for="scu-nombre">Nombre <em>*</em></label><input id="scu-nombre" name="nombre" maxlength="100" autocomplete="given-name" required></div>
+          <div class="scu-field"><label for="scu-apellido">Apellido <em>*</em></label><input id="scu-apellido" name="apellido" maxlength="100" autocomplete="family-name" required></div>
+          <div class="scu-field"><label for="scu-tipo-documento">Tipo de documento <em>*</em></label><select id="scu-tipo-documento" name="tipo_documento" required><option value="">Seleccionar</option><option value="CC">Cédula de ciudadanía (CC)</option><option value="TI">Tarjeta de identidad (TI)</option><option value="CE">Cédula de extranjería (CE)</option><option value="PAS">Pasaporte (PAS)</option></select></div>
+          <div class="scu-field"><label for="scu-numero-documento">Número de documento <em>*</em></label><input id="scu-numero-documento" name="numero_documento" maxlength="30" required></div>
+          <div class="scu-field"><label for="scu-telefono">Teléfono</label><input id="scu-telefono" name="telefono" type="tel" maxlength="30" autocomplete="tel"></div>
+          <div class="scu-field"><label for="scu-correo">Correo electrónico <em>*</em></label><input id="scu-correo" name="correo" type="email" maxlength="150" autocomplete="email" required></div>
+        </div>
+      </div>
+      <div class="scu-form-step" data-form-step="2" hidden>
+        <h3>Datos de acceso</h3>
+        <p class="scu-step-description">Esta será la cuenta que la persona utilizará para iniciar sesión.</p>
+        <div class="scu-form-grid scu-form-grid-one">
+          <div class="scu-field"><label for="scu-usuario">Nombre de usuario <em>*</em></label><input id="scu-usuario" name="usuario" maxlength="100" autocomplete="username" placeholder="Ej. laura.gomez" required></div>
+          <div class="scu-field"><label for="scu-contrasena">Contraseña temporal <em>*</em></label><input id="scu-contrasena" name="contrasena" type="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required><small>La contraseña se almacenará cifrada mediante hash.</small></div>
+        </div>
+        <div class="scu-security-note"><strong>Recomendación de seguridad</strong><span>Usa una contraseña única y compártela de forma segura con el funcionario.</span></div>
+      </div>
+      <div class="scu-form-step" data-form-step="3" hidden>
+        <h3>Asignar rol y acceso</h3>
+        <p class="scu-step-description">El rol define las funciones que tendrá disponibles el usuario.</p>
+        <div class="scu-role-options">
+          {% for rol in roles %}
+          <label class="scu-role-option">
+            <input type="radio" name="id_rol" value="{{ rol.id_rol }}" required>
+            <span class="scu-role-option-content">
+              <strong>{{ rol.nombre }}</strong>
+              <small>{{ rol.descripcion or 'Permisos definidos para este perfil.' }}</small>
             </span>
-
-            <h1>Gestión de Usuarios</h1>
-
-            <p>
-                Administra los usuarios y roles que tienen acceso a Smile Cloud.
-            </p>
+            <span class="scu-role-check" aria-hidden="true">✓</span>
+          </label>
+          {% endfor %}
         </div>
+        <div class="scu-final-note">La cuenta se creará en estado <strong>Activo</strong>. Verifica los datos antes de guardar.</div>
+      </div>
 
-        <button class="btn-nuevo-usuario" type="button" onclick="abrirModalUsuario()">
-            <i class="bi bi-person-plus"></i>
-            Nuevo usuario
-        </button>
-
-    </div>
-
-    <div class="tarjetas-usuarios">
-
-        <div class="tarjeta-usuario">
-            <div class="icono-tarjeta-usuario">
-                <i class="bi bi-people"></i>
-            </div>
-
-            <div>
-                <span class="numero-usuario">04</span>
-                <span class="nombre-tarjeta-usuario">Usuarios registrados</span>
-            </div>
+      <footer class="scu-modal-actions">
+        <button type="button" class="scu-btn scu-btn-quiet" data-close-user-modal>Cancelar</button>
+        <div class="scu-modal-actions-right">
+          <button type="button" class="scu-btn scu-btn-secondary" id="scu-prev-step" hidden>← Atrás</button>
+          <button type="button" class="scu-btn scu-btn-primary" id="scu-next-step">Continuar →</button>
+          <button type="submit" class="scu-btn scu-btn-primary" id="scu-submit-user" hidden>Crear usuario ✓</button>
         </div>
-
-
-        <div class="tarjeta-usuario">
-            <div class="icono-tarjeta-usuario activo">
-                <i class="bi bi-person-check"></i>
-            </div>
-
-            <div>
-                <span class="numero-usuario">04</span>
-                <span class="nombre-tarjeta-usuario">Usuarios activos</span>
-            </div>
-        </div>
-
-
-        <div class="tarjeta-usuario">
-            <div class="icono-tarjeta-usuario inactivo">
-                <i class="bi bi-person-x"></i>
-            </div>
-
-            <div>
-                <span class="numero-usuario">00</span>
-                <span class="nombre-tarjeta-usuario">Usuarios inactivos</span>
-            </div>
-        </div>
-
-    </div>
-
-    <section class="seccion-usuarios">
-
-        <div class="cabecera-usuarios">
-
-            <div>
-                <h2>
-                    <i class="bi bi-list-ul"></i>
-                    Usuarios registrados
-                </h2>
-
-                <p>
-                    Consulta y administra las cuentas del sistema.
-                </p>
-            </div>
-
-            <div class="buscador-usuarios">
-
-                <i class="bi bi-search"></i>
-
-                <input
-                    type="text"
-                    id="buscarUsuario"
-                    placeholder="Buscar usuario..."
-                    onkeyup="buscarUsuarios()"
-                >
-
-            </div>
-
-        </div>
-
-
-        <div class="tabla-responsive-usuarios">
-
-            <table class="tabla-usuarios" id="tablaUsuarios">
-
-                <thead>
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Correo electrónico</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr>
-
-                        <td>
-                            <div class="usuario-info">
-
-                                <div class="avatar-usuario">
-                                    A
-                                </div>
-
-                                <div>
-                                    <strong>admin.smilecloud</strong>
-                                    <span>Administrador principal</span>
-                                </div>
-
-                            </div>
-                        </td>
-
-                        <td>
-                            admin@smilecloud.com
-                        </td>
-
-                        <td>
-                            <span class="rol-usuario administrador">
-                                Administrador
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="estado-usuario activo">
-                                <i class="bi bi-circle-fill"></i>
-                                Activo
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="acciones-usuario">
-
-                                <button
-                                    class="btn-accion editar"
-                                    title="Editar usuario"
-                                    onclick="editarUsuario('admin.smilecloud')"
-                                >
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-
-                                <button
-                                    class="btn-accion desactivar"
-                                    title="Desactivar usuario"
-                                    onclick="cambiarEstadoUsuario('admin.smilecloud')"
-                                >
-                                    <i class="bi bi-person-dash"></i>
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>
-                            <div class="usuario-info">
-
-                                <div class="avatar-usuario">
-                                    L
-                                </div>
-
-                                <div>
-                                    <strong>laura.gomez</strong>
-                                    <span>Cuenta profesional</span>
-                                </div>
-
-                            </div>
-                        </td>
-
-                        <td>
-                            laura.gomez@smilecloud.com
-                        </td>
-
-                        <td>
-                            <span class="rol-usuario odontologo">
-                                Odontólogo
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="estado-usuario activo">
-                                <i class="bi bi-circle-fill"></i>
-                                Activo
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="acciones-usuario">
-
-                                <button
-                                    class="btn-accion editar"
-                                    title="Editar usuario"
-                                    onclick="editarUsuario('laura.gomez')"
-                                >
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-
-                                <button
-                                    class="btn-accion desactivar"
-                                    title="Desactivar usuario"
-                                    onclick="cambiarEstadoUsuario('laura.gomez')"
-                                >
-                                    <i class="bi bi-person-dash"></i>
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-                    <tr>
-
-                        <td>
-                            <div class="usuario-info">
-
-                                <div class="avatar-usuario">
-                                    C
-                                </div>
-
-                                <div>
-                                    <strong>carlos.martinez</strong>
-                                    <span>Cuenta profesional</span>
-                                </div>
-
-                            </div>
-                        </td>
-
-                        <td>
-                            carlos.martinez@smilecloud.com
-                        </td>
-
-                        <td>
-                            <span class="rol-usuario odontologo">
-                                Odontólogo
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="estado-usuario activo">
-                                <i class="bi bi-circle-fill"></i>
-                                Activo
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="acciones-usuario">
-
-                                <button
-                                    class="btn-accion editar"
-                                    title="Editar usuario"
-                                    onclick="editarUsuario('carlos.martinez')"
-                                >
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-
-                                <button
-                                    class="btn-accion desactivar"
-                                    title="Desactivar usuario"
-                                    onclick="cambiarEstadoUsuario('carlos.martinez')"
-                                >
-                                    <i class="bi bi-person-dash"></i>
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-                    <tr>
-
-                        <td>
-                            <div class="usuario-info">
-
-                                <div class="avatar-usuario">
-                                    S
-                                </div>
-
-                                <div>
-                                    <strong>sofia.perez</strong>
-                                    <span>Personal administrativo</span>
-                                </div>
-
-                            </div>
-                        </td>
-
-                        <td>
-                            sofia.perez@smilecloud.com
-                        </td>
-
-                        <td>
-                            <span class="rol-usuario recepcionista">
-                                Recepcionista
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="estado-usuario activo">
-                                <i class="bi bi-circle-fill"></i>
-                                Activo
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="acciones-usuario">
-
-                                <button
-                                    class="btn-accion editar"
-                                    title="Editar usuario"
-                                    onclick="editarUsuario('sofia.perez')"
-                                >
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-
-                                <button
-                                    class="btn-accion desactivar"
-                                    title="Desactivar usuario"
-                                    onclick="cambiarEstadoUsuario('sofia.perez')"
-                                >
-                                    <i class="bi bi-person-dash"></i>
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-
-            <!-- MENSAJE SIN RESULTADOS -->
-            <div id="sinResultadosUsuarios" class="sin-resultados-usuarios">
-
-                <i class="bi bi-search"></i>
-
-                <h3>No se encontraron usuarios</h3>
-
-                <p>
-                    Intenta realizar la búsqueda con otro nombre o correo.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
+      </footer>
+    </form>
+  </section>
 </div>
-
-
-<div id="modalUsuario" class="modal-usuario">
-
-    <div class="contenido-modal-usuario">
-
-        <div class="encabezado-modal-usuario">
-
-            <div>
-                <span class="icono-modal-usuario">
-                    <i class="bi bi-person-plus"></i>
-                </span>
-
-                <div>
-                    <h2>Nuevo usuario</h2>
-                    <p>Registra una nueva cuenta en Smile Cloud.</p>
-                </div>
-            </div>
-
-            <button
-                type="button"
-                class="cerrar-modal-usuario"
-                onclick="cerrarModalUsuario()"
-            >
-                <i class="bi bi-x-lg"></i>
-            </button>
-
-        </div>
-
-
-        <form id="formUsuario" onsubmit="guardarUsuario(event)">
-
-            <div class="formulario-usuarios">
-
-                <div class="campo-usuario">
-
-                    <label for="nombreUsuario">
-                        Nombre de usuario
-                    </label>
-
-                    <div class="input-usuario">
-
-                        <i class="bi bi-person"></i>
-
-                        <input
-                            type="text"
-                            id="nombreUsuario"
-                            name="usuario"
-                            placeholder="Ej. maria.garcia"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="campo-usuario">
-
-                    <label for="correoUsuario">
-                        Correo electrónico
-                    </label>
-
-                    <div class="input-usuario">
-
-                        <i class="bi bi-envelope"></i>
-
-                        <input
-                            type="email"
-                            id="correoUsuario"
-                            name="correo"
-                            placeholder="usuario@smilecloud.com"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="campo-usuario">
-
-                    <label for="contrasenaUsuario">
-                        Contraseña
-                    </label>
-
-                    <div class="input-usuario">
-
-                        <i class="bi bi-lock"></i>
-
-                        <input
-                            type="password"
-                            id="contrasenaUsuario"
-                            name="contrasena"
-                            placeholder="Ingrese una contraseña"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="campo-usuario">
-
-                    <label for="rolUsuario">
-                        Rol
-                    </label>
-
-                    <div class="input-usuario">
-
-                        <i class="bi bi-shield-check"></i>
-
-                        <select id="rolUsuario" name="id_rol" required>
-
-                            <option value="">
-                                Seleccione un rol
-                            </option>
-
-                            <option value="1">
-                                Administrador
-                            </option>
-
-                            <option value="2">
-                                Odontólogo
-                            </option>
-
-                            <option value="3">
-                                Recepcionista
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="informacion-modal-usuario">
-
-                <i class="bi bi-info-circle"></i>
-
-                <span>
-                    El rol determinará las funciones y módulos disponibles
-                    para el usuario dentro del sistema.
-                </span>
-
-            </div>
-
-
-            <div class="botones-modal-usuario">
-
-                <button
-                    type="button"
-                    class="btn-cancelar-usuario"
-                    onclick="cerrarModalUsuario()"
-                >
-                    Cancelar
-                </button>
-
-                <button
-                    type="submit"
-                    class="btn-guardar-usuario"
-                >
-                    <i class="bi bi-check-lg"></i>
-                    Registrar usuario
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
 
 <script>
+(() => {
+  const modal = document.getElementById('scu-user-modal');
+  const form = document.getElementById('scu-create-form');
+  if (!modal || !form) return;
+  const steps = [...form.querySelectorAll('[data-form-step]')];
+  const indicators = [...modal.querySelectorAll('[data-step-indicator]')];
+  const next = document.getElementById('scu-next-step');
+  const prev = document.getElementById('scu-prev-step');
+  const submit = document.getElementById('scu-submit-user');
+  const progress = document.getElementById('scu-modal-progress-bar');
+  let current = 1;
+  let previousFocus = null;
 
-/* =========================
-   BUSCAR USUARIOS
-========================= */
-
-function buscarUsuarios() {
-
-    const input = document.getElementById("buscarUsuario");
-    const filtro = input.value.toLowerCase().trim();
-
-    const tabla = document.getElementById("tablaUsuarios");
-    const filas = tabla.querySelectorAll("tbody tr");
-
-    const mensaje = document.getElementById("sinResultadosUsuarios");
-
-    let encontrados = 0;
-
-    filas.forEach(function(fila) {
-
-        const texto = fila.textContent.toLowerCase();
-
-        if (texto.includes(filtro)) {
-
-            fila.style.display = "";
-            encontrados++;
-
-        } else {
-
-            fila.style.display = "none";
-
-        }
-
+  function setStep(n) {
+    current = n;
+    steps.forEach((step, i) => {
+      const active = i + 1 === n;
+      step.hidden = !active;
+      step.classList.toggle('is-current', active);
     });
-
-
-    if (encontrados === 0) {
-
-        mensaje.style.display = "flex";
-
-    } else {
-
-        mensaje.style.display = "none";
-
+    indicators.forEach((item, i) => {
+      item.classList.toggle('is-current', i + 1 === n);
+      item.classList.toggle('is-complete', i + 1 < n);
+    });
+    progress.style.width = `${n / 3 * 100}%`;
+    prev.hidden = n === 1;
+    next.hidden = n === 3;
+    submit.hidden = n !== 3;
+    const first = steps[n - 1].querySelector('input:not([type=radio]), select');
+    if (first) first.focus({preventScroll:true});
+  }
+  function openModal() {
+    previousFocus = document.activeElement;
+    modal.hidden = false;
+    document.body.classList.add('scu-modal-open');
+    setStep(1);
+  }
+  function closeModal() {
+    modal.hidden = true;
+    document.body.classList.remove('scu-modal-open');
+    if (previousFocus) previousFocus.focus();
+  }
+  function validateStep() {
+    const active = steps[current - 1];
+    const fields = [...active.querySelectorAll('input,select')].filter(el => el.required);
+    for (const field of fields) {
+      if (field.type === 'radio') {
+        const group = fields.filter(el => el.name === field.name);
+        if (!group.some(el => el.checked)) {
+          field.reportValidity();
+          return false;
+        }
+      } else if (!field.checkValidity()) {
+        field.reportValidity();
+        field.focus();
+        return false;
+      }
     }
+    return true;
+  }
+  document.querySelector('[data-open-user-modal]')?.addEventListener('click', openModal);
+  modal.querySelectorAll('[data-close-user-modal]').forEach(el => el.addEventListener('click', closeModal));
+  next.addEventListener('click', () => { if (validateStep()) setStep(Math.min(3, current + 1)); });
+  prev.addEventListener('click', () => setStep(Math.max(1, current - 1)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 
-}
-
-
-/* =========================
-   ABRIR MODAL
-========================= */
-
-function abrirModalUsuario() {
-
-    const modal = document.getElementById("modalUsuario");
-
-    modal.classList.add("mostrar");
-
-    document.body.style.overflow = "hidden";
-
-}
-
-
-/* =========================
-   CERRAR MODAL
-========================= */
-
-function cerrarModalUsuario() {
-
-    const modal = document.getElementById("modalUsuario");
-
-    modal.classList.remove("mostrar");
-
-    document.body.style.overflow = "";
-
-}
-
-
-/* =========================
-   CERRAR AL HACER CLICK AFUERA
-========================= */
-
-window.addEventListener("click", function(event) {
-
-    const modal = document.getElementById("modalUsuario");
-
-    if (event.target === modal) {
-
-        cerrarModalUsuario();
-
-    }
-
-});
-
-
-/* =========================
-   CERRAR CON ESCAPE
-========================= */
-
-document.addEventListener("keydown", function(event) {
-
-    if (event.key === "Escape") {
-
-        cerrarModalUsuario();
-
-    }
-
-});
-
-
-/* =========================
-   GUARDAR USUARIO
-========================= */
-
-function guardarUsuario(event) {
-
-    event.preventDefault();
-
-    alert(
-        "La interfaz está lista. " +
-        "La conexión con la base de datos se realizará en el siguiente paso."
-    );
-
-    document.getElementById("formUsuario").reset();
-
-    cerrarModalUsuario();
-
-}
-
-
-/* =========================
-   EDITAR USUARIO
-========================= */
-
-function editarUsuario(usuario) {
-
-    alert(
-        "Editar usuario: " + usuario +
-        "\n\nEsta función se conectará con la base de datos posteriormente."
-    );
-
-}
-
-
-/* =========================
-   CAMBIAR ESTADO
-========================= */
-
-function cambiarEstadoUsuario(usuario) {
-
-    const confirmar = confirm(
-        "¿Deseas cambiar el estado del usuario " +
-        usuario +
-        "?"
-    );
-
-    if (confirmar) {
-
-        alert(
-            "El cambio de estado se conectará con la base de datos posteriormente."
-        );
-
-    }
-
-}
-
+  const search = document.getElementById('scu-search');
+  const roleFilter = document.getElementById('scu-role-filter');
+  const statusFilter = document.getElementById('scu-status-filter');
+  const rows = [...document.querySelectorAll('#scu-users-table tbody tr[data-role]')];
+  const noResults = document.getElementById('scu-no-results');
+  const count = document.getElementById('scu-results-count');
+  function filterRows() {
+    const query = (search.value || '').toLocaleLowerCase('es');
+    let visible = 0;
+    rows.forEach(row => {
+      const matchText = row.innerText.toLocaleLowerCase('es').includes(query);
+      const matchRole = !roleFilter.value || row.dataset.role === roleFilter.value;
+      const matchStatus = !statusFilter.value || row.dataset.status === statusFilter.value;
+      const show = matchText && matchRole && matchStatus;
+      row.hidden = !show;
+      if (show) visible++;
+    });
+    noResults.hidden = visible > 0;
+    count.textContent = `${visible} ${visible === 1 ? 'usuario' : 'usuarios'}`;
+  }
+  [search, roleFilter, statusFilter].forEach(el => el.addEventListener('input', filterRows));
+})();
 </script>
-
 {% endblock %}

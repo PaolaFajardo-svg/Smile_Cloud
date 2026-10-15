@@ -277,34 +277,43 @@ def eliminar(id):
     return redirect(url_for('pacientes_view'))
 
 
+
 # ============================================================
 # EDITAR PACIENTE
 # ============================================================
 
 @app.route('/editar/<int:id>')
 def editar(id):
-
     if 'correo' not in session:
         return redirect(url_for('login'))
 
-    respuesta = requests.get(
-        "http://127.0.0.1:8000/pacientes"
-    )
+    try:
+        respuesta = requests.get(
+            "http://127.0.0.1:8000/pacientes",
+            timeout=10
+        )
+        respuesta.raise_for_status()
+        pacientes = respuesta.json()
 
-    pacientes = respuesta.json()
+        paciente = next(
+            (p for p in pacientes if p['id_paciente'] == id),
+            None
+        )
 
-    paciente = next(
-        (
-            p for p in pacientes
-            if p['id_paciente'] == id
-        ),
-        None
-    )
+        if paciente is None:
+            return redirect(url_for('pacientes_view'))
 
-    return render_template(
-        'editar_paciente.html',
-        paciente=paciente
-    )
+        return render_template(
+            'editar_paciente.html',
+            paciente=paciente
+        )
+
+    except (requests.RequestException, ValueError):
+        return (
+            "No se pudo consultar la información del paciente. "
+            "Verifica que el servicio de pacientes esté funcionando.",
+            503
+        )
 
 
 # ============================================================
@@ -313,48 +322,90 @@ def editar(id):
 
 @app.route('/actualizar/<int:id>', methods=['POST'])
 def actualizar(id):
-
     if 'correo' not in session:
         return redirect(url_for('login'))
 
-    respuesta_pacientes = requests.get(
-        "http://127.0.0.1:8000/pacientes"
-    )
+    try:
+        # Consultar el paciente actual para conservar su estado
+        respuesta_pacientes = requests.get(
+            "http://127.0.0.1:8000/pacientes",
+            timeout=10
+        )
+        respuesta_pacientes.raise_for_status()
 
-    pacientes = respuesta_pacientes.json()
+        pacientes = respuesta_pacientes.json()
 
-    paciente_actual = next(
-        (
-            p for p in pacientes
-            if p['id_paciente'] == id
-        ),
-        None
-    )
+        paciente_actual = next(
+            (p for p in pacientes if p['id_paciente'] == id),
+            None
+        )
 
-    if not paciente_actual:
-        return redirect(url_for('pacientes_view'))
+        if paciente_actual is None:
+            return redirect(url_for('pacientes_view'))
 
-    datos = {
-        "tipo_documento": request.form['tipo_documento'],
-        "numero_documento": request.form['numero_documento'],
-        "nombre": request.form['nombre'],
-        "apellido": request.form['apellido'],
-        "fecha_nacimiento": request.form['fecha_nacimiento'],
-        "sexo": request.form['sexo'],
-        "telefono": request.form['telefono'],
-        "correo": request.form['correo'],
-        "direccion": request.form['direccion'],
-        "eps": request.form['eps'],
+        # Preparar los datos del formulario
+        datos = {
+            "tipo_documento": request.form.get(
+                "tipo_documento", ""
+            ).strip(),
+            "numero_documento": request.form.get(
+                "numero_documento", ""
+            ).strip(),
+            "nombre": request.form.get("nombre", "").strip(),
+            "apellido": request.form.get("apellido", "").strip(),
+            "fecha_nacimiento": (
+                request.form.get("fecha_nacimiento") or None
+            ),
+            "sexo": request.form.get("sexo") or None,
+            "telefono": request.form.get("telefono", "").strip() or None,
+            "correo": request.form.get("correo", "").strip() or None,
+            "direccion": request.form.get("direccion", "").strip() or None,
+            "eps": request.form.get("eps", "").strip() or None,
+            "estado": paciente_actual['estado']
+        }
 
-        "estado": paciente_actual['estado']
-    }
+        # Validar campos obligatorios
+        if not all([
+            datos["tipo_documento"],
+            datos["numero_documento"],
+            datos["nombre"],
+            datos["apellido"]
+        ]):
+            return render_template(
+                'editar_paciente.html',
+                paciente={**paciente_actual, **datos},
+                error="Completa los campos obligatorios."
+            ), 400
 
-    requests.put(
-        f"http://127.0.0.1:8000/pacientes/{id}",
-        json=datos
-    )
+        # Enviar actualización al servicio de pacientes
+        respuesta = requests.put(
+            f"http://127.0.0.1:8000/pacientes/{id}",
+            json=datos,
+            timeout=10
+        )
 
-    return redirect(url_for('pacientes_view'))
+        if respuesta.ok:
+            return redirect(url_for('pacientes_view'))
+
+        mensaje_error = (
+            "No se pudieron guardar los cambios. "
+            "Verifica que el documento no esté registrado "
+            "en otro paciente."
+        )
+
+        return render_template(
+            'editar_paciente.html',
+            paciente={**paciente_actual, **datos},
+            error=mensaje_error
+        ), 400
+
+    except requests.RequestException:
+        return (
+            "No se pudo conectar con el servicio de pacientes. "
+            "Verifica que esté funcionando e inténtalo nuevamente.",
+            503
+        )
+
 
 
 # ============================================================

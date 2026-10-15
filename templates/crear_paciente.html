@@ -1,732 +1,240 @@
 {% extends "base.html" %}
 
-{% block title %}
-Crear paciente | Smile Cloud
-{% endblock %}
+{% block title %}Registrar paciente | Smile Cloud{% endblock %}
 
 {% block content %}
-
-<main class="pagina-formulario-paciente">
-
-    <section class="encabezado-pagina-formulario">
-
+<main class="sc-paciente-page sc-modal-flow">
+    <header class="sc-paciente-header">
         <div>
-            <span class="titulo-pequeno">
-                Gestión clínica
-            </span>
-
-            <h1>
-                Registro de Nuevo Paciente
-            </h1>
-
-            <p>
-                Complete la información necesaria para registrar un nuevo paciente.
-            </p>
+            <p class="sc-eyebrow">GESTIÓN DE PACIENTES</p>
+            <h1>Registrar paciente</h1>
+            <p class="sc-subtitle">Completa el registro paso a paso. La información está organizada en ventanas para que sea más fácil de diligenciar.</p>
         </div>
+        <a href="{{ url_for('pacientes_view') }}" class="sc-btn sc-btn-secondary">Volver a pacientes</a>
+    </header>
 
-        <a href="/pacientes" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i>
-            Volver a pacientes
-        </a>
-
+    <section class="sc-start-card">
+        <div class="sc-start-copy">
+            <span class="sc-start-kicker">NUEVO REGISTRO</span>
+            <h2>Información del paciente</h2>
+            <p>El formulario está dividido en tres pasos: identificación, contacto y afiliación. Puedes avanzar y regresar antes de guardar.</p>
+            <button type="button" class="sc-btn sc-btn-primary sc-btn-large" data-open-modal="sc-modal-identificacion">
+                Iniciar registro <span aria-hidden="true">→</span>
+            </button>
+        </div>
+        <div class="sc-start-progress" aria-label="Tres pasos del formulario">
+            <div class="sc-progress-step"><span>01</span><div><strong>Identificación</strong><small>Datos personales</small></div></div>
+            <div class="sc-progress-step"><span>02</span><div><strong>Contacto</strong><small>Teléfono y dirección</small></div></div>
+            <div class="sc-progress-step"><span>03</span><div><strong>Afiliación</strong><small>Información de EPS</small></div></div>
+        </div>
     </section>
 
+    <form action="{{ url_for('crear_paciente') }}" method="POST" class="sc-paciente-form sc-modal-form" id="sc-form-paciente">
+        <!-- VENTANA 1: IDENTIFICACIÓN -->
+        <section class="sc-modal-overlay" id="sc-modal-identificacion" role="dialog" aria-modal="true" aria-labelledby="sc-title-identificacion" hidden>
+            <div class="sc-modal-panel">
+                <div class="sc-modal-top">
+                    <div>
+                        <p class="sc-modal-step">PASO 1 DE 3</p>
+                        <h2 id="sc-title-identificacion">Identificación del paciente</h2>
+                        <p>Ingresa los datos básicos para identificar a la persona.</p>
+                    </div>
+                    <button type="button" class="sc-modal-close" data-close-modal aria-label="Cerrar ventana">×</button>
+                </div>
+                <div class="sc-modal-progress"><span style="width: 33.333%"></span></div>
 
-    <form action="/crear_paciente" method="POST" class="formulario-paciente-pagina">
+                <div class="sc-form-grid">
+                    <div class="sc-field">
+                        <label for="tipo_documento">Tipo de documento <span class="sc-required">*</span></label>
+                        <select id="tipo_documento" name="tipo_documento" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="CC">Cédula de ciudadanía (CC)</option>
+                            <option value="TI">Tarjeta de identidad (TI)</option>
+                            <option value="CE">Cédula de extranjería (CE)</option>
+                            <option value="PAS">Pasaporte (PAS)</option>
+                        </select>
+                    </div>
+                    <div class="sc-field">
+                        <label for="numero_documento">Número de documento <span class="sc-required">*</span></label>
+                        <input id="numero_documento" name="numero_documento" type="text" maxlength="30" autocomplete="off" placeholder="Ej. 1001001001" required>
+                    </div>
+                    <div class="sc-field">
+                        <label for="nombre">Nombre(s) <span class="sc-required">*</span></label>
+                        <input id="nombre" name="nombre" type="text" maxlength="100" autocomplete="given-name" placeholder="Nombre del paciente" required>
+                    </div>
+                    <div class="sc-field">
+                        <label for="apellido">Apellido(s) <span class="sc-required">*</span></label>
+                        <input id="apellido" name="apellido" type="text" maxlength="100" autocomplete="family-name" placeholder="Apellido del paciente" required>
+                    </div>
+                    <div class="sc-field">
+                        <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                        <input id="fecha_nacimiento" name="fecha_nacimiento" type="date">
+                    </div>
+                    <div class="sc-field">
+                        <label for="sexo">Sexo</label>
+                        <select id="sexo" name="sexo">
+                            <option value="">Selecciona una opción</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="Prefiere no decir">Prefiere no decir</option>
+                        </select>
+                    </div>
+                </div>
 
-
-        <!-- ================= INFORMACIÓN DEL PACIENTE ================= -->
-
-        <section class="seccion-formulario">
-
-            <div class="titulo-seccion">
-
-                <i class="bi bi-person"></i>
-
-                Información del paciente
-
+                <div class="sc-modal-actions">
+                    <button type="button" class="sc-btn sc-btn-quiet" data-close-modal>Cancelar</button>
+                    <button type="button" class="sc-btn sc-btn-primary" data-next-modal="sc-modal-contacto">Continuar <span aria-hidden="true">→</span></button>
+                </div>
             </div>
-
-
-            <div class="row g-3">
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Primer nombre *
-                    </label>
-
-                    <input
-                        type="text"
-                        name="nombre"
-                        class="form-control"
-                        placeholder="Ingrese el nombre"
-                        required>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Segundo nombre
-                    </label>
-
-                    <input
-                        type="text"
-                        name="segundo_nombre"
-                        class="form-control"
-                        placeholder="Segundo nombre">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Primer apellido *
-                    </label>
-
-                    <input
-                        type="text"
-                        name="apellido"
-                        class="form-control"
-                        placeholder="Ingrese el apellido"
-                        required>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Segundo apellido
-                    </label>
-
-                    <input
-                        type="text"
-                        name="segundo_apellido"
-                        class="form-control"
-                        placeholder="Segundo apellido">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Documento de identidad *
-                    </label>
-
-                    <input
-                        type="text"
-                        name="numero_documento"
-                        class="form-control"
-                        placeholder="Número de documento"
-                        required>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Tipo de documento
-                    </label>
-
-                    <select
-                        name="tipo_documento"
-                        class="form-select"
-                        required>
-
-                        <option value="">
-                            Seleccione
-                        </option>
-
-                        <option value="CC">
-                            Cédula de ciudadanía
-                        </option>
-
-                        <option value="TI">
-                            Tarjeta de identidad
-                        </option>
-
-                        <option value="CE">
-                            Cédula de extranjería
-                        </option>
-
-                        <option value="PAS">
-                            Pasaporte
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Fecha de nacimiento
-                    </label>
-
-                    <input
-                        type="date"
-                        name="fecha_nacimiento"
-                        class="form-control">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Género
-                    </label>
-
-                    <select
-                        name="sexo"
-                        class="form-select">
-
-                        <option value="">
-                            Seleccione
-                        </option>
-
-                        <option value="Femenino">
-                            Femenino
-                        </option>
-
-                        <option value="Masculino">
-                            Masculino
-                        </option>
-
-                        <option value="Otro">
-                            Otro
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Dirección
-                    </label>
-
-                    <input
-                        type="text"
-                        name="direccion"
-                        class="form-control"
-                        placeholder="Dirección de residencia">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Ciudad
-                    </label>
-
-                    <input
-                        type="text"
-                        name="ciudad"
-                        class="form-control"
-                        placeholder="Ciudad">
-
-                </div>
-
-
-                <div class="col-md-2">
-
-                    <label>
-                        Estado
-                    </label>
-
-                    <input
-                        type="text"
-                        name="estado"
-                        class="form-control"
-                        placeholder="Estado">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Código postal
-                    </label>
-
-                    <input
-                        type="text"
-                        name="codigo_postal"
-                        class="form-control"
-                        placeholder="Código postal">
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label>
-                        Correo electrónico
-                    </label>
-
-                    <input
-                        type="email"
-                        name="correo"
-                        class="form-control"
-                        placeholder="ejemplo@correo.com">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Teléfono
-                    </label>
-
-                    <input
-                        type="text"
-                        name="telefono"
-                        class="form-control"
-                        placeholder="Número de teléfono">
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <label>
-                        Teléfono alternativo
-                    </label>
-
-                    <input
-                        type="text"
-                        name="telefono_alternativo"
-                        class="form-control"
-                        placeholder="Número alternativo">
-
-                </div>
-
-            </div>
-
         </section>
 
+        <!-- VENTANA 2: CONTACTO -->
+        <section class="sc-modal-overlay" id="sc-modal-contacto" role="dialog" aria-modal="true" aria-labelledby="sc-title-contacto" hidden>
+            <div class="sc-modal-panel">
+                <div class="sc-modal-top">
+                    <div>
+                        <p class="sc-modal-step">PASO 2 DE 3</p>
+                        <h2 id="sc-title-contacto">Información de contacto</h2>
+                        <p>Estos datos permiten comunicarse con el paciente cuando sea necesario.</p>
+                    </div>
+                    <button type="button" class="sc-modal-close" data-close-modal aria-label="Cerrar ventana">×</button>
+                </div>
+                <div class="sc-modal-progress"><span style="width: 66.666%"></span></div>
 
-        <!-- ================= CONTACTO DE EMERGENCIA ================= -->
+                <div class="sc-form-grid">
+                    <div class="sc-field">
+                        <label for="telefono">Teléfono</label>
+                        <input id="telefono" name="telefono" type="tel" maxlength="30" autocomplete="tel" placeholder="Número de contacto">
+                    </div>
+                    <div class="sc-field">
+                        <label for="correo">Correo electrónico</label>
+                        <input id="correo" name="correo" type="email" maxlength="150" autocomplete="email" placeholder="nombre@correo.com">
+                    </div>
+                    <div class="sc-field sc-field-wide">
+                        <label for="direccion">Dirección de residencia</label>
+                        <input id="direccion" name="direccion" type="text" maxlength="200" autocomplete="street-address" placeholder="Calle, carrera, número y complemento">
+                    </div>
+                </div>
 
-        <section class="seccion-formulario">
-
-            <div class="titulo-seccion">
-
-                <i class="bi bi-telephone"></i>
-
-                Contacto de emergencia
-
+                <div class="sc-modal-actions sc-modal-actions-split">
+                    <button type="button" class="sc-btn sc-btn-secondary" data-prev-modal="sc-modal-identificacion"><span aria-hidden="true">←</span> Atrás</button>
+                    <button type="button" class="sc-btn sc-btn-primary" data-next-modal="sc-modal-afiliacion">Continuar <span aria-hidden="true">→</span></button>
+                </div>
             </div>
-
-
-            <div class="row g-3">
-
-                <div class="col-md-4">
-
-                    <label>
-                        Nombre completo
-                    </label>
-
-                    <input
-                        type="text"
-                        name="contacto_emergencia"
-                        class="form-control"
-                        placeholder="Nombre del contacto">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Parentesco
-                    </label>
-
-                    <input
-                        type="text"
-                        name="parentesco"
-                        class="form-control"
-                        placeholder="Ej. Madre, padre, hermano">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Número de contacto
-                    </label>
-
-                    <input
-                        type="text"
-                        name="telefono_emergencia"
-                        class="form-control"
-                        placeholder="Teléfono">
-
-                </div>
-
-            </div>
-
         </section>
 
+        <!-- VENTANA 3: AFILIACIÓN Y GUARDADO -->
+        <section class="sc-modal-overlay" id="sc-modal-afiliacion" role="dialog" aria-modal="true" aria-labelledby="sc-title-afiliacion" hidden>
+            <div class="sc-modal-panel">
+                <div class="sc-modal-top">
+                    <div>
+                        <p class="sc-modal-step">PASO 3 DE 3</p>
+                        <h2 id="sc-title-afiliacion">Información de afiliación</h2>
+                        <p>Completa la EPS si el paciente cuenta con esta afiliación.</p>
+                    </div>
+                    <button type="button" class="sc-modal-close" data-close-modal aria-label="Cerrar ventana">×</button>
+                </div>
+                <div class="sc-modal-progress"><span style="width: 100%"></span></div>
 
-        <!-- ================= INFORMACIÓN MÉDICA ================= -->
+                <div class="sc-form-grid sc-form-grid-single">
+                    <div class="sc-field">
+                        <label for="eps">EPS</label>
+                        <input id="eps" name="eps" type="text" maxlength="100" placeholder="Nombre de la EPS">
+                    </div>
+                </div>
 
-        <section class="seccion-formulario">
+                <div class="sc-form-note"><span class="sc-required">*</span> Campos obligatorios. El paciente se registrará con estado Activo.</div>
 
-            <div class="titulo-seccion">
-
-                <i class="bi bi-heart-pulse"></i>
-
-                Información médica
-
+                <div class="sc-modal-actions sc-modal-actions-final">
+                    <button type="button" class="sc-btn sc-btn-secondary" data-prev-modal="sc-modal-contacto"><span aria-hidden="true">←</span> Atrás</button>
+                    <div class="sc-final-buttons">
+                        <a href="{{ url_for('pacientes_view') }}" class="sc-btn sc-btn-quiet">Cancelar</a>
+                        <button type="reset" class="sc-btn sc-btn-outline">Limpiar</button>
+                        <button type="submit" class="sc-btn sc-btn-primary sc-btn-save">Guardar paciente <span aria-hidden="true">✓</span></button>
+                    </div>
+                </div>
             </div>
-
-
-            <div class="row g-3">
-
-                <div class="col-md-4">
-
-                    <label>
-                        Médico de cabecera
-                    </label>
-
-                    <input
-                        type="text"
-                        name="medico_cabecera"
-                        class="form-control"
-                        placeholder="Nombre del médico">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Teléfono médico
-                    </label>
-
-                    <input
-                        type="text"
-                        name="telefono_medico"
-                        class="form-control"
-                        placeholder="Teléfono">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Dirección médica
-                    </label>
-
-                    <input
-                        type="text"
-                        name="direccion_medica"
-                        class="form-control"
-                        placeholder="Dirección">
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label>
-                        Condiciones médicas
-                    </label>
-
-                    <textarea
-                        name="condiciones_medicas"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Describa las condiciones médicas relevantes"></textarea>
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label>
-                        Medicamentos actuales
-                    </label>
-
-                    <textarea
-                        name="medicamentos"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Indique los medicamentos que utiliza actualmente"></textarea>
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label>
-                        Alergias
-                    </label>
-
-                    <textarea
-                        name="alergias"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Indique alergias conocidas"></textarea>
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label>
-                        Observaciones médicas
-                    </label>
-
-                    <textarea
-                        name="observaciones_medicas"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Información adicional"></textarea>
-
-                </div>
-
-            </div>
-
         </section>
-
-
-        <!-- ================= INFORMACIÓN DEL SEGURO ================= -->
-
-        <section class="seccion-formulario">
-
-            <div class="titulo-seccion">
-
-                <i class="bi bi-shield-check"></i>
-
-                Información del seguro
-
-            </div>
-
-
-            <div class="row g-3">
-
-                <div class="col-md-4">
-
-                    <label>
-                        Entidad / EPS
-                    </label>
-
-                    <input
-                        type="text"
-                        name="eps"
-                        class="form-control"
-                        placeholder="Nombre de la EPS">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Plan
-                    </label>
-
-                    <input
-                        type="text"
-                        name="plan"
-                        class="form-control"
-                        placeholder="Tipo de plan">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Teléfono
-                    </label>
-
-                    <input
-                        type="text"
-                        name="telefono_eps"
-                        class="form-control"
-                        placeholder="Teléfono de la entidad">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Número de póliza
-                    </label>
-
-                    <input
-                        type="text"
-                        name="numero_poliza"
-                        class="form-control">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Número de grupo
-                    </label>
-
-                    <input
-                        type="text"
-                        name="numero_grupo"
-                        class="form-control">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <label>
-                        Número de seguridad social
-                    </label>
-
-                    <input
-                        type="text"
-                        name="seguridad_social"
-                        class="form-control">
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= INFORMACIÓN ADICIONAL ================= -->
-
-        <section class="seccion-formulario">
-
-            <div class="titulo-seccion">
-
-                <i class="bi bi-file-text"></i>
-
-                Información adicional
-
-            </div>
-
-
-            <div class="row g-3">
-
-                <div class="col-md-6">
-
-                    <label>
-                        Nombre del padre o acudiente
-                    </label>
-
-                    <input
-                        type="text"
-                        name="acudiente"
-                        class="form-control"
-                        placeholder="Si aplica">
-
-                </div>
-
-
-                <div class="col-md-6">
-
-                    <label>
-                        Relación con el paciente
-                    </label>
-
-                    <input
-                        type="text"
-                        name="relacion_acudiente"
-                        class="form-control"
-                        placeholder="Ej. Madre, padre, tutor">
-
-                </div>
-
-
-                <div class="col-md-12">
-
-                    <label>
-                        Observaciones
-                    </label>
-
-                    <textarea
-                        name="observaciones"
-                        class="form-control"
-                        rows="3"
-                        placeholder="Escriba cualquier información adicional"></textarea>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= AVISO ================= -->
-
-        <div class="alerta-formulario">
-
-            <i class="bi bi-info-circle"></i>
-
-            <span>
-                La información registrada debe ser verídica y será utilizada
-                exclusivamente para la gestión del paciente dentro de Smile Cloud.
-            </span>
-
-        </div>
-
-
-        <!-- ================= BOTONES ================= -->
-
-        <div class="acciones-formulario">
-
-            <a
-                href="/pacientes"
-                class="btn btn-secondary">
-
-                Cancelar
-
-            </a>
-
-
-            <button
-                type="reset"
-                class="btn btn-outline-secondary">
-
-                Limpiar
-
-            </button>
-
-
-            <button
-                type="submit"
-                class="btn btn-success">
-
-                <i class="bi bi-person-plus"></i>
-
-                Guardar paciente
-
-            </button>
-
-        </div>
-
     </form>
-
 </main>
 
+<script>
+(() => {
+    const form = document.getElementById('sc-form-paciente');
+    if (!form) return;
+
+    const overlays = Array.from(form.querySelectorAll('.sc-modal-overlay'));
+    let activeModal = null;
+    let lastFocused = null;
+
+    function openModal(id) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        overlays.forEach(modal => {
+            modal.hidden = true;
+            modal.classList.remove('sc-modal-visible');
+        });
+        target.hidden = false;
+        requestAnimationFrame(() => target.classList.add('sc-modal-visible'));
+        activeModal = target;
+        lastFocused = document.activeElement;
+        document.body.classList.add('sc-modal-open');
+        const firstInput = target.querySelector('input, select, textarea, button');
+        if (firstInput) firstInput.focus();
+    }
+
+    function closeModal() {
+        if (!activeModal) return;
+        activeModal.classList.remove('sc-modal-visible');
+        activeModal.hidden = true;
+        activeModal = null;
+        document.body.classList.remove('sc-modal-open');
+        if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    }
+
+    document.querySelectorAll('[data-open-modal]').forEach(button => {
+        button.addEventListener('click', () => openModal(button.dataset.openModal));
+    });
+
+    form.querySelectorAll('[data-close-modal]').forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
+
+    form.querySelectorAll('[data-next-modal]').forEach(button => {
+        button.addEventListener('click', () => {
+            const requiredFields = Array.from(activeModal.querySelectorAll('[required]'));
+            const firstInvalid = requiredFields.find(field => !field.checkValidity());
+            if (firstInvalid) {
+                firstInvalid.reportValidity();
+                firstInvalid.focus();
+                return;
+            }
+            openModal(button.dataset.nextModal);
+        });
+    });
+
+    form.querySelectorAll('[data-prev-modal]').forEach(button => {
+        button.addEventListener('click', () => openModal(button.dataset.prevModal));
+    });
+
+    overlays.forEach(overlay => {
+        overlay.addEventListener('click', event => {
+            if (event.target === overlay) closeModal();
+        });
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && activeModal) closeModal();
+    });
+
+    form.addEventListener('reset', () => {
+        window.setTimeout(() => {
+            closeModal();
+            const startButton = document.querySelector('[data-open-modal="sc-modal-identificacion"]');
+            if (startButton) startButton.focus();
+        }, 0);
+    });
+})();
+</script>
 {% endblock %}
